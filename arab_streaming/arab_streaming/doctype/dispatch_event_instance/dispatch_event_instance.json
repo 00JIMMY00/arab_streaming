@@ -1,0 +1,112 @@
+{
+ "doctype": "DocType",
+ "name": "Dispatch Event Instance",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 1,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "instance_type",
+  "synced",
+  "metadata",
+  "instance_name",
+  "doctype_config",
+  "ignore",
+  "pairing_id",
+  "pairing_generation",
+  "payload_digest",
+  "next_attempt_at",
+  "attempts"
+ ],
+ "fields": [
+  {
+   "fieldname": "instance_type",
+   "fieldtype": "Link",
+   "label": "Instance Type",
+   "options": "DocType",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "synced",
+   "fieldtype": "Check",
+   "label": "Synced",
+   "default": "0",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "metadata",
+   "fieldtype": "JSON",
+   "label": "Metadata",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "instance_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Instance Name",
+   "options": "instance_type",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "doctype_config",
+   "fieldtype": "Code",
+   "label": "Doctype Config",
+   "options": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ignore",
+   "fieldtype": "Check",
+   "label": "Ignore",
+   "default": "0",
+   "read_only_depends_on": "eval:doc.synced"
+  },
+  {
+   "fieldname": "pairing_id",
+   "fieldtype": "Data",
+   "label": "Pairing Id",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "pairing_generation",
+   "fieldtype": "Long Int",
+   "label": "Pairing Generation",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "payload_digest",
+   "fieldtype": "Data",
+   "label": "Payload Digest",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "next_attempt_at",
+   "fieldtype": "Datetime",
+   "label": "Next Attempt At",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "attempts",
+   "fieldtype": "Int",
+   "label": "Attempts",
+   "default": "0",
+   "hidden": 1,
+   "read_only": 1
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash",
+ "editable_grid": 1
+}

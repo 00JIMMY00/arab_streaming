@@ -3,7 +3,7 @@ name = "arab_streaming"
 authors = [
     { name = "Arab-ERP company", email = "jimmygamaljimmy@gmail.com"}
 ]
-description = "streaming app from offline to online cloud instance"
+description = "Arab-ERP selected-data synchronization for ERPNext master and branch sites"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]

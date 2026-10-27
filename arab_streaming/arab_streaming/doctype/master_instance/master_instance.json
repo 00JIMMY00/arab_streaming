@@ -1,0 +1,183 @@
+{
+ "doctype": "DocType",
+ "name": "Master Instance",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 1,
+ "allow_rename": 0,
+ "field_order": [
+  "domain",
+  "access_key",
+  "secret",
+  "syncing_doctypes",
+  "restaurant_branch",
+  "connection_status",
+  "syncing_status",
+  "total_syncing_document",
+  "progress",
+  "slave_name",
+  "exceptions",
+  "initial_sync_doctypes",
+  "enabled",
+  "last_requested_connection",
+  "last_successful_connection",
+  "last_connection_exception",
+  "last_capture_exception",
+  "last_dispatch_exception",
+  "site_domain",
+  "receiving_doctypes_data"
+ ],
+ "fields": [
+  {
+   "fieldname": "domain",
+   "fieldtype": "Data",
+   "label": "Domain",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "access_key",
+   "fieldtype": "Data",
+   "label": "Access Key",
+   "reqd": 1
+  },
+  {
+   "fieldname": "secret",
+   "fieldtype": "Password",
+   "label": "Secret",
+   "reqd": 1
+  },
+  {
+   "fieldname": "syncing_doctypes",
+   "fieldtype": "Table",
+   "label": "Syncing Doctypes",
+   "options": "Instance Syncing Doctype"
+  },
+  {
+   "fieldname": "restaurant_branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "connection_status",
+   "fieldtype": "Select",
+   "label": "Connection Status",
+   "options": "Connected\nDisconnected",
+   "default": "Disconnected",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "syncing_status",
+   "fieldtype": "Select",
+   "label": "Syncing Status",
+   "options": "Not Started\nFailed\nIn Progress\nComplete",
+   "default": "Not Started",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_syncing_document",
+   "fieldtype": "Int",
+   "label": "Total Syncing Document",
+   "read_only": 1
+  },
+  {
+   "fieldname": "progress",
+   "fieldtype": "Percent",
+   "label": "Progress",
+   "read_only": 1
+  },
+  {
+   "fieldname": "slave_name",
+   "fieldtype": "Data",
+   "label": "Remote Slave Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "exceptions",
+   "fieldtype": "Small Text",
+   "label": "Exceptions",
+   "read_only": 1
+  },
+  {
+   "fieldname": "initial_sync_doctypes",
+   "fieldtype": "Table",
+   "label": "Initial Sync Doctypes",
+   "options": "Instance Initial Sync Doctype"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_requested_connection",
+   "fieldtype": "Datetime",
+   "label": "Last Requested Connection",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_successful_connection",
+   "fieldtype": "Datetime",
+   "label": "Last Successful Connection",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_connection_exception",
+   "fieldtype": "Code",
+   "label": "Last Connection Exception",
+   "options": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_capture_exception",
+   "fieldtype": "Code",
+   "label": "Last Capture Exception",
+   "options": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_dispatch_exception",
+   "fieldtype": "Code",
+   "label": "Last Dispatch Exception",
+   "options": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "site_domain",
+   "fieldtype": "Data",
+   "label": "Site Domain"
+  },
+  {
+   "fieldname": "receiving_doctypes_data",
+   "fieldtype": "Code",
+   "label": "Receiving Doctypes Data",
+   "options": "JSON",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash"
+}

@@ -1,41 +1,34 @@
-### Arab Streaming
+# Arab-ERP Streaming
 
-streaming app from offline to online cloud instance
+Selected ERPNext data synchronization between a master site and branch sites, built for Frappe/ERPNext v15.
 
-### Installation
+Version `0.1.0.dev0` implements the foundation: eight core DocTypes, Streaming Settings, durable internal state and replay identities, explicit site-role guards, ERPNext Branch participation, secure Instance Key generation and Administrator-only secret access. The protocol validator preserves 64-bit sequences as decimal strings and validates bounded, hashed JSON envelopes.
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+Replication is still under development. Link/Ping, authentication, HTTP transport, source capture, business execution, initial copy, files, stock/accounting adapters and event retention are not available yet. There are no business document hooks or synchronization schedules in this release. Installation leaves the site role unconfigured and does not create connections, keys or business rules.
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app arab_streaming
+## Development installation
+
+Use a dedicated test bench and fresh test database. Install ERPNext v15 first, then this app:
+
+```sh
+bench --site <TEST_SITE> install-app erpnext
+bench --site <TEST_SITE> install-app arab_streaming
+bench --site <TEST_SITE> set-config allow_tests true
+bench --site <TEST_SITE> run-tests --app arab_streaming --skip-test-records
 ```
 
-### Contributing
+The site-specific configuration key `arab_streaming_site_role` accepts `Master` or `Slave`. Leaving it absent keeps the app unconfigured; invalid values fail explicitly. Do not configure the working master or enable production replication until the documented isolated acceptance gates pass.
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+Streaming Settings preserves the documented defaults: retention 7 days (blank/zero means effective 60), stock snapshot age 900 seconds (minimum 600 when strict mode is enabled), strict action validation on and strict stock validation on. These settings do not implement stock reconciliation or cleanup by themselves.
 
-```bash
-cd apps/arab_streaming
-pre-commit install
-```
+ERPNext Branch gains `custom_streaming_enabled`, initially off. New Master Instance forms suggest UOM and Item Group in the initial-copy table; ongoing tables remain empty unless a registered provider contributes explicit rows. Migration preserves saved settings, branch selection, connection rules and installation identity.
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+## Verification and project records
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
+The canonical repository is `local-personal2:/home/xxx/bench1/my-bench/apps/arab_streaming`. The isolated bench is `/home/xxx/bench1/arab-streaming-test`, with `streaming-master.test` and `streaming-slave.test`, separate MariaDB/Redis services and a paused scheduler. No production migration is part of this foundation delivery.
 
-### CI
+See [docs/README.md](docs/README.md), [docs/IMPLEMENTATION_CONTRACT.md](docs/IMPLEMENTATION_CONTRACT.md), and [docs/PROGRESS.md](docs/PROGRESS.md) for scope, chosen contracts, task evidence and remaining work. The existing `docs/` ignore rule is preserved; selected project documents must be explicitly force-added when a future commit is prepared. Nothing is staged or committed by this coding session.
 
-This app can use GitHub Actions for CI. The following workflows are configured:
+The CI workflow targets the v15 branches and installs ERPNext before this app. Local verification does not imply that GitHub Actions has run.
 
-- CI: Installs this app and runs unit tests on every push to `develop` branch.
-- Linters: Runs [Frappe Semgrep Rules](https://github.com/frappe/semgrep-rules) and [pip-audit](https://pypi.org/project/pip-audit/) on every pull request.
-
-
-### License
-
-mit
+License: MIT.

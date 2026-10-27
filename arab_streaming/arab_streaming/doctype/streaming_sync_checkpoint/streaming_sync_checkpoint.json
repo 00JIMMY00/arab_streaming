@@ -1,0 +1,73 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Sync Checkpoint",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 1,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "row_key",
+  "doctype_name",
+  "last_record",
+  "page_token",
+  "processed_count",
+  "complete",
+  "diagnostic"
+ ],
+ "fields": [
+  {
+   "fieldname": "row_key",
+   "fieldtype": "Data",
+   "label": "Row Key",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "Doctype Name",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_record",
+   "fieldtype": "Data",
+   "label": "Last Record",
+   "read_only": 1
+  },
+  {
+   "fieldname": "page_token",
+   "fieldtype": "Small Text",
+   "label": "Page Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "processed_count",
+   "fieldtype": "Long Int",
+   "label": "Processed Count",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "complete",
+   "fieldtype": "Check",
+   "label": "Complete",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "diagnostic",
+   "fieldtype": "Small Text",
+   "label": "Diagnostic",
+   "read_only": 1
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash",
+ "editable_grid": 1
+}

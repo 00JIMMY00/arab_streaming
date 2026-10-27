@@ -1,0 +1,116 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Initial Sync Run",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "master_instance",
+  "generation",
+  "manifest_id",
+  "boundary_h0",
+  "boundary_h1",
+  "status",
+  "retention_hold",
+  "lease_token",
+  "lease_expires_at",
+  "manifest_expires_at",
+  "checkpoints"
+ ],
+ "fields": [
+  {
+   "fieldname": "master_instance",
+   "fieldtype": "Link",
+   "label": "Master Instance",
+   "options": "Master Instance",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "generation",
+   "fieldtype": "Long Int",
+   "label": "Generation",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "manifest_id",
+   "fieldtype": "Data",
+   "label": "Manifest Id",
+   "read_only": 1
+  },
+  {
+   "fieldname": "boundary_h0",
+   "fieldtype": "Long Int",
+   "label": "Boundary H0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "boundary_h1",
+   "fieldtype": "Long Int",
+   "label": "Boundary H1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "In Progress\nFailed\nComplete",
+   "default": "In Progress",
+   "read_only": 1
+  },
+  {
+   "fieldname": "retention_hold",
+   "fieldtype": "Check",
+   "label": "Retention Hold",
+   "default": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lease_token",
+   "fieldtype": "Data",
+   "label": "Lease Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lease_expires_at",
+   "fieldtype": "Datetime",
+   "label": "Lease Expires At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "manifest_expires_at",
+   "fieldtype": "Datetime",
+   "label": "Manifest Expires At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "checkpoints",
+   "fieldtype": "Table",
+   "label": "Checkpoints",
+   "options": "Streaming Sync Checkpoint",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash"
+}

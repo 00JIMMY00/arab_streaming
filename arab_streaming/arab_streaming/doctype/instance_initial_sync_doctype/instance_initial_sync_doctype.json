@@ -1,0 +1,96 @@
+{
+ "doctype": "DocType",
+ "name": "Instance Initial Sync Doctype",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 1,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "doctype_name",
+  "conditions",
+  "sync_from",
+  "document_count",
+  "synced",
+  "mandatory",
+  "ignore_links",
+  "skip_if_exists",
+  "skip_links_if_exists",
+  "ignore_branch"
+ ],
+ "fields": [
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "DocType Name",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Code",
+   "label": "Conditions",
+   "options": "Python"
+  },
+  {
+   "fieldname": "sync_from",
+   "fieldtype": "Datetime",
+   "label": "Sync From"
+  },
+  {
+   "fieldname": "document_count",
+   "fieldtype": "Int",
+   "label": "Document Count",
+   "default": "0",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "synced",
+   "fieldtype": "Check",
+   "label": "Synced",
+   "default": "0",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "mandatory",
+   "fieldtype": "Check",
+   "label": "Mandatory",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ignore_links",
+   "fieldtype": "Check",
+   "label": "Ignore Links",
+   "default": "0"
+  },
+  {
+   "fieldname": "skip_if_exists",
+   "fieldtype": "Check",
+   "label": "Skip If Exists",
+   "default": "0"
+  },
+  {
+   "fieldname": "skip_links_if_exists",
+   "fieldtype": "Check",
+   "label": "Skip Links If Exists",
+   "default": "0"
+  },
+  {
+   "fieldname": "ignore_branch",
+   "fieldtype": "Check",
+   "label": "Ignore Branch",
+   "default": "0"
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash",
+ "editable_grid": 1
+}

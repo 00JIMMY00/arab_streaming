@@ -1,0 +1,136 @@
+{
+ "doctype": "DocType",
+ "name": "Instance Syncing Doctype",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 1,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "doctype_name",
+  "priority",
+  "conditions",
+  "directly_inserted_in_db",
+  "on_duplicated_insert",
+  "ignore_validation",
+  "lock_documents",
+  "allow_creation",
+  "sync_events_after_submit",
+  "lock_documents_after_submit",
+  "allow_amend",
+  "allow_rename",
+  "prevent_delete",
+  "ignore_branch",
+  "prevent_local_delete",
+  "allow_local_rename"
+ ],
+ "fields": [
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "DocType Name",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority",
+   "default": "100",
+   "non_negative": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Code",
+   "label": "Conditions",
+   "options": "Python"
+  },
+  {
+   "fieldname": "directly_inserted_in_db",
+   "fieldtype": "Check",
+   "label": "Directly Inserted In DB",
+   "default": "0"
+  },
+  {
+   "fieldname": "on_duplicated_insert",
+   "fieldtype": "Select",
+   "label": "On Duplicated Insert",
+   "options": "\nSkip\nThrow Error\nUpdate"
+  },
+  {
+   "fieldname": "ignore_validation",
+   "fieldtype": "Check",
+   "label": "Ignore Validation",
+   "default": "0"
+  },
+  {
+   "fieldname": "lock_documents",
+   "fieldtype": "Check",
+   "label": "Lock Documents",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_creation",
+   "fieldtype": "Check",
+   "label": "Allow Creation",
+   "default": "0"
+  },
+  {
+   "fieldname": "sync_events_after_submit",
+   "fieldtype": "Check",
+   "label": "Sync Events After Submit",
+   "default": "0"
+  },
+  {
+   "fieldname": "lock_documents_after_submit",
+   "fieldtype": "Check",
+   "label": "Lock Documents After Submit",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_amend",
+   "fieldtype": "Check",
+   "label": "Allow Amend",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_rename",
+   "fieldtype": "Check",
+   "label": "Allow Rename",
+   "default": "0"
+  },
+  {
+   "fieldname": "prevent_delete",
+   "fieldtype": "Check",
+   "label": "Prevent Delete",
+   "default": "0"
+  },
+  {
+   "fieldname": "ignore_branch",
+   "fieldtype": "Check",
+   "label": "Ignore Branch",
+   "default": "0"
+  },
+  {
+   "fieldname": "prevent_local_delete",
+   "fieldtype": "Check",
+   "label": "Prevent Local Delete",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_local_rename",
+   "fieldtype": "Check",
+   "label": "Allow Local Rename",
+   "default": "0"
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash",
+ "editable_grid": 1
+}

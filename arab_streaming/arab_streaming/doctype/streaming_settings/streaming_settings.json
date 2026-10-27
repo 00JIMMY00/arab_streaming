@@ -1,0 +1,62 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Settings",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 1,
+ "track_changes": 1,
+ "allow_rename": 0,
+ "field_order": [
+  "clear_events_after_days",
+  "stock_snapshot_max_age",
+  "strictly_validate_document_actions",
+  "strict_stock_snapshot_validation"
+ ],
+ "fields": [
+  {
+   "fieldname": "clear_events_after_days",
+   "fieldtype": "Int",
+   "label": "Clear Events After (Days)",
+   "default": "7",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "stock_snapshot_max_age",
+   "fieldtype": "Duration",
+   "label": "Stock Snapshot Max Age",
+   "default": "900",
+   "depends_on": "eval:doc.strict_stock_snapshot_validation",
+   "mandatory_depends_on": "eval:doc.strict_stock_snapshot_validation"
+  },
+  {
+   "fieldname": "strictly_validate_document_actions",
+   "fieldtype": "Check",
+   "label": "Strictly Validate Document Actions",
+   "default": "1"
+  },
+  {
+   "fieldname": "strict_stock_snapshot_validation",
+   "fieldtype": "Check",
+   "label": "Strict Stock Snapshot Validation",
+   "default": "1"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 1,
+   "create": 0,
+   "delete": 0,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

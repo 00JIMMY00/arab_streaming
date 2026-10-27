@@ -1,0 +1,93 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Event Receipt",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "source_installation_id",
+  "pairing_id",
+  "pairing_generation",
+  "remote_dispatch_event",
+  "payload_digest",
+  "capture_event",
+  "event_sequence",
+  "received_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "source_installation_id",
+   "fieldtype": "Data",
+   "label": "Source Installation Id",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "pairing_id",
+   "fieldtype": "Data",
+   "label": "Pairing Id",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "pairing_generation",
+   "fieldtype": "Long Int",
+   "label": "Pairing Generation",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "remote_dispatch_event",
+   "fieldtype": "Data",
+   "label": "Remote Dispatch Event",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "payload_digest",
+   "fieldtype": "Data",
+   "label": "Payload Digest",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "capture_event",
+   "fieldtype": "Data",
+   "label": "Capture Event",
+   "read_only": 1
+  },
+  {
+   "fieldname": "event_sequence",
+   "fieldtype": "Long Int",
+   "label": "Event Sequence",
+   "read_only": 1
+  },
+  {
+   "fieldname": "received_on",
+   "fieldtype": "Datetime",
+   "label": "Received On",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash"
+}

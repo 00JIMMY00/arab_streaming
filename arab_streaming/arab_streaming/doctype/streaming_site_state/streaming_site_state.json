@@ -1,0 +1,49 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Site State",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "installation_id",
+  "event_sequence"
+ ],
+ "fields": [
+  {
+   "fieldname": "installation_id",
+   "fieldtype": "Data",
+   "label": "Installation Id",
+   "reqd": 1,
+   "unique": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "event_sequence",
+   "fieldtype": "Long Int",
+   "label": "Event Sequence",
+   "default": "0",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "prompt"
+}

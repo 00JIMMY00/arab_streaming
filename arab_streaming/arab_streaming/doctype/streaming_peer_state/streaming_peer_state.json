@@ -1,0 +1,121 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Peer State",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "field_order": [
+  "instance_type",
+  "instance_name",
+  "remote_installation_id",
+  "pairing_id",
+  "pairing_generation",
+  "link_request_id",
+  "active_branch",
+  "received_through",
+  "acknowledged_through",
+  "lease_token",
+  "lease_expires_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "instance_type",
+   "fieldtype": "Link",
+   "label": "Instance Type",
+   "options": "DocType",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "instance_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Instance Name",
+   "options": "instance_type",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "remote_installation_id",
+   "fieldtype": "Data",
+   "label": "Remote Installation Id",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "pairing_id",
+   "fieldtype": "Data",
+   "label": "Pairing Id",
+   "reqd": 1,
+   "unique": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "pairing_generation",
+   "fieldtype": "Long Int",
+   "label": "Pairing Generation",
+   "default": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "link_request_id",
+   "fieldtype": "Data",
+   "label": "Link Request Id",
+   "unique": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "active_branch",
+   "fieldtype": "Data",
+   "label": "Active Branch",
+   "unique": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "received_through",
+   "fieldtype": "Long Int",
+   "label": "Received Through",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "acknowledged_through",
+   "fieldtype": "Long Int",
+   "label": "Acknowledged Through",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lease_token",
+   "fieldtype": "Data",
+   "label": "Lease Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lease_expires_at",
+   "fieldtype": "Datetime",
+   "label": "Lease Expires At",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "print": 0,
+   "email": 0,
+   "export": 0,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "autoname": "hash"
+}
