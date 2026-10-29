@@ -43,10 +43,11 @@ arab_streaming.copy_existing_dialog = async frm => {
   const history=(preview.recent_runs || []).map(run => `<li><a href="${esc(preview.source_url.replace(/\/$/,'')+'/app/streaming-copy-run/'+encodeURIComponent(run.name))}" target="_blank" rel="noopener noreferrer">${esc(run.name)}</a>: ${esc(__(run.status))}</li>`).join('');
   d.fields_dict.preview.$wrapper.html(`<div class="alert alert-info"><strong>${esc(preview.source_url)}</strong> → <strong>${esc(preview.destination_url)}</strong><br>
    ${__('Matching source records')}: <strong>${preview.at_least ? __('At least')+' ' : ''}${preview.count}</strong></div>
+   ${!preview.count && !preview.at_least ? `<div class="alert alert-warning">${__('No source records match. Check the source record’s Branch and the rule’s filters or Branch Field.')}</div>` : ''}
    <p>${__('This run copies records that existed when it starts, using the saved Branch and rule filters. Records are read in small batches; new changes continue through normal sync.')}</p>
    <p>${values().existing_policy === 'Skip' ? __('Existing destination records will be preserved.') : __('Existing destination records follow the rule policy: {0}.',[esc(opts.duplicate_policy)])}</p>
    ${history ? `<p>${__('Recent copy runs for this Branch and direction')}:</p><ul>${history}</ul>` : ''}`);
-  d.set_primary_action(__('Start Copy'),doStart);
+  d.set_primary_action(__(preview.count || preview.at_least ? 'Start Copy' : 'Preview Copy'), preview.count || preview.at_least ? doStart : doPreview);
  };
  d = new frappe.ui.Dialog({title:__('Copy Existing Records'),fields:[
   {fieldname:'direction',label:__('Direction'),fieldtype:'Select',options:opts.directions,default:opts.directions[0],reqd:1,onchange:reset},
