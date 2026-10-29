@@ -18,7 +18,11 @@
   "ignore_links",
   "skip_if_exists",
   "skip_links_if_exists",
-  "ignore_branch"
+  "ignore_branch",
+  "scope",
+  "branch_field",
+  "rule_id",
+  "rule_revision"
  ],
  "fields": [
   {
@@ -86,6 +90,28 @@
    "fieldtype": "Check",
    "label": "Ignore Branch",
    "default": "0"
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "label": "Scope",
+   "options": "\nBranch\nShared",
+   "description": "Blank resolves Branch when a Branch field exists; otherwise Shared for ordinary reference data."
+  },
+  {
+   "fieldname": "branch_field",
+   "fieldtype": "Data",
+   "label": "Branch Field"
+  },
+  {
+   "fieldname": "rule_id",
+   "fieldtype": "Data",
+   "label": "Rule Id"
+  },
+  {
+   "fieldname": "rule_revision",
+   "fieldtype": "Long Int",
+   "label": "Rule Revision"
   }
  ],
  "permissions": [],

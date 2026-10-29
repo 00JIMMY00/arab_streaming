@@ -9,34 +9,127 @@
  "track_changes": 1,
  "allow_rename": 0,
  "field_order": [
-  "domain",
-  "access_key",
-  "secret",
-  "syncing_doctypes",
-  "restaurant_branch",
+  "connection_tab",
+  "connection_summary",
   "connection_status",
   "syncing_status",
-  "total_syncing_document",
   "progress",
+  "summary_column",
+  "enabled",
+  "restaurant_branch",
   "slave_name",
+  "connection_details",
+  "domain",
+  "site_domain",
+  "execution_user",
+  "credentials_section",
+  "access_key",
+  "secret",
+  "initial_copy_tab",
+  "total_syncing_document",
   "exceptions",
   "initial_sync_doctypes",
-  "enabled",
+  "ongoing_tab",
+  "streaming_rules_summary",
+  "syncing_doctypes",
+  "health_tab",
   "last_requested_connection",
   "last_successful_connection",
   "last_connection_exception",
   "last_capture_exception",
   "last_dispatch_exception",
-  "site_domain",
+  "advanced_tab",
   "receiving_doctypes_data"
  ],
  "fields": [
+  {
+   "fieldname": "connection_tab",
+   "fieldtype": "Tab Break",
+   "label": "Connection"
+  },
+  {
+   "fieldname": "connection_summary",
+   "fieldtype": "Section Break",
+   "label": "Connection and readiness"
+  },
+  {
+   "fieldname": "connection_status",
+   "fieldtype": "Select",
+   "label": "Connection Status",
+   "options": "Connected\nDisconnected",
+   "default": "Disconnected",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "syncing_status",
+   "fieldtype": "Select",
+   "label": "Existing Records Copy Status",
+   "options": "Not Started\nFailed\nIn Progress\nComplete",
+   "default": "Not Started",
+   "read_only": 1
+  },
+  {
+   "fieldname": "progress",
+   "fieldtype": "Percent",
+   "label": "Existing Records Copy Progress",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_column",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "restaurant_branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "slave_name",
+   "fieldtype": "Data",
+   "label": "Remote Slave Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "connection_details",
+   "fieldtype": "Section Break",
+   "label": "Site details"
+  },
   {
    "fieldname": "domain",
    "fieldtype": "Data",
    "label": "Domain",
    "reqd": 1,
    "in_list_view": 1
+  },
+  {
+   "fieldname": "site_domain",
+   "fieldtype": "Data",
+   "label": "Site Domain"
+  },
+  {
+   "fieldname": "execution_user",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Execution User",
+   "read_only": 0,
+   "description": "Approved local integration user for received business operations."
+  },
+  {
+   "fieldname": "credentials_section",
+   "fieldtype": "Section Break",
+   "label": "Credentials",
+   "collapsible": 1
   },
   {
    "fieldname": "access_key",
@@ -51,51 +144,14 @@
    "reqd": 1
   },
   {
-   "fieldname": "syncing_doctypes",
-   "fieldtype": "Table",
-   "label": "Syncing Doctypes",
-   "options": "Instance Syncing Doctype"
-  },
-  {
-   "fieldname": "restaurant_branch",
-   "fieldtype": "Link",
-   "label": "Branch",
-   "options": "Branch",
-   "read_only": 1
-  },
-  {
-   "fieldname": "connection_status",
-   "fieldtype": "Select",
-   "label": "Connection Status",
-   "options": "Connected\nDisconnected",
-   "default": "Disconnected",
-   "read_only": 1,
-   "in_list_view": 1
-  },
-  {
-   "fieldname": "syncing_status",
-   "fieldtype": "Select",
-   "label": "Syncing Status",
-   "options": "Not Started\nFailed\nIn Progress\nComplete",
-   "default": "Not Started",
-   "read_only": 1
+   "fieldname": "initial_copy_tab",
+   "fieldtype": "Tab Break",
+   "label": "Copy Existing Records"
   },
   {
    "fieldname": "total_syncing_document",
    "fieldtype": "Int",
    "label": "Total Syncing Document",
-   "read_only": 1
-  },
-  {
-   "fieldname": "progress",
-   "fieldtype": "Percent",
-   "label": "Progress",
-   "read_only": 1
-  },
-  {
-   "fieldname": "slave_name",
-   "fieldtype": "Data",
-   "label": "Remote Slave Name",
    "read_only": 1
   },
   {
@@ -107,15 +163,28 @@
   {
    "fieldname": "initial_sync_doctypes",
    "fieldtype": "Table",
-   "label": "Initial Sync Doctypes",
-   "options": "Instance Initial Sync Doctype"
+   "label": "Copy existing records: master \u2192 this slave",
+   "options": "Instance Initial Sync Doctype",
+   "description": "Used only when you click Copy Existing Records \u2192 Sync. This table does not enable automatic syncing of future changes. Conditions blank = all records of that DocType."
   },
   {
-   "fieldname": "enabled",
-   "fieldtype": "Check",
-   "label": "Enabled",
-   "default": "1",
+   "fieldname": "ongoing_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sync Rules"
+  },
+  {
+   "fieldname": "syncing_doctypes",
+   "fieldtype": "Table",
+   "label": "Automatic changes: this slave \u2192 master",
+   "options": "Instance Syncing Doctype",
+   "description": "Controls new saves on THIS slave. To send master changes here, edit the Slave Instance on the master. Conditions blank = every record; a name condition restricts sync to those names. Save, then Connection \u2192 Ping to refresh the other site.",
+   "hidden": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "health_tab",
+   "fieldtype": "Tab Break",
+   "label": "Connection Health"
   },
   {
    "fieldname": "last_requested_connection",
@@ -151,16 +220,21 @@
    "read_only": 1
   },
   {
-   "fieldname": "site_domain",
-   "fieldtype": "Data",
-   "label": "Site Domain"
+   "fieldname": "advanced_tab",
+   "fieldtype": "Tab Break",
+   "label": "Advanced"
   },
   {
    "fieldname": "receiving_doctypes_data",
    "fieldtype": "Code",
-   "label": "Receiving Doctypes Data",
+   "label": "Rules received from master (diagnostics)",
    "options": "JSON",
-   "read_only": 1
+   "read_only": 1,
+   "description": "Read-only information refreshed by Ping. Configure master \u2192 slave rules on the master Slave Instance."
+  },
+  {
+   "fieldname": "streaming_rules_summary",
+   "fieldtype": "HTML"
   }
  ],
  "permissions": [

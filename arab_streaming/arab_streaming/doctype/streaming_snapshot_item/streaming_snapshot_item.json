@@ -1,0 +1,99 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Snapshot Item",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "autoname": "hash",
+ "field_order": [
+  "export",
+  "row_key",
+  "position",
+  "reference_doctype",
+  "reference_name",
+  "data",
+  "payload_digest",
+  "files",
+  "protected_version"
+ ],
+ "fields": [
+  {
+   "fieldname": "export",
+   "label": "Export",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "Streaming Export",
+   "reqd": 1
+  },
+  {
+   "fieldname": "row_key",
+   "label": "Row Key",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "position",
+   "label": "Position",
+   "fieldtype": "Long Int",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "label": "Reference Doctype",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "label": "Reference Name",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "data",
+   "label": "Data",
+   "fieldtype": "Code",
+   "read_only": 1,
+   "options": "JSON",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payload_digest",
+   "label": "Payload Digest",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "files",
+   "fieldtype": "Code",
+   "options": "JSON",
+   "label": "File Manifest"
+  },
+  {
+   "fieldname": "protected_version",
+   "label": "Protected Bootstrap Version",
+   "fieldtype": "Link",
+   "options": "Streaming Protected Version",
+   "hidden": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

@@ -1,0 +1,98 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Export",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "autoname": "hash",
+ "field_order": [
+  "peer_state",
+  "request_id",
+  "configuration",
+  "boundary_h0",
+  "boundary_h1",
+  "status",
+  "expires_at",
+  "total_count",
+  "boundary_h1_set"
+ ],
+ "fields": [
+  {
+   "fieldname": "peer_state",
+   "label": "Peer State",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "Streaming Peer State",
+   "reqd": 1
+  },
+  {
+   "fieldname": "request_id",
+   "label": "Request Id",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "configuration",
+   "label": "Configuration",
+   "fieldtype": "Code",
+   "read_only": 1,
+   "options": "JSON",
+   "reqd": 1
+  },
+  {
+   "fieldname": "boundary_h0",
+   "label": "Boundary H0",
+   "fieldtype": "Long Int",
+   "read_only": 1
+  },
+  {
+   "fieldname": "boundary_h1",
+   "label": "Boundary H1",
+   "fieldtype": "Long Int",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "label": "Status",
+   "fieldtype": "Select",
+   "read_only": 1,
+   "options": "In Progress\nComplete\nAbandoned",
+   "default": "In Progress"
+  },
+  {
+   "fieldname": "expires_at",
+   "label": "Expires At",
+   "fieldtype": "Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_count",
+   "label": "Total Count",
+   "fieldtype": "Long Int",
+   "read_only": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "boundary_h1_set",
+   "fieldtype": "Check",
+   "label": "Catch-up Boundary Set",
+   "default": "0",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

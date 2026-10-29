@@ -19,7 +19,27 @@
   "received_through",
   "acknowledged_through",
   "lease_token",
-  "lease_expires_at"
+  "lease_expires_at",
+  "execution_user",
+  "incoming_key",
+  "remote_access_key",
+  "remote_secret",
+  "policy_hash",
+  "last_delivery",
+  "last_delivery_error",
+  "agent_heartbeat",
+  "writer_code",
+  "incoming_access_key",
+  "incoming_secret",
+  "receiver_registered",
+  "observed_source_head",
+  "policy_errors",
+  "stock_acknowledged_through",
+  "stock_received_safe",
+  "stock_checked_at",
+  "stock_status",
+  "stock_exception",
+  "stock_reconciled_at"
  ],
  "fields": [
   {
@@ -98,6 +118,134 @@
    "fieldname": "lease_expires_at",
    "fieldtype": "Datetime",
    "label": "Lease Expires At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "execution_user",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Execution User",
+   "read_only": 1,
+   "description": "Approved local integration user for received business operations."
+  },
+  {
+   "fieldname": "incoming_key",
+   "fieldtype": "Link",
+   "label": "Incoming Key",
+   "options": "Instance Key",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remote_access_key",
+   "fieldtype": "Data",
+   "label": "Remote Access Key",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remote_secret",
+   "fieldtype": "Password",
+   "label": "Remote Secret",
+   "read_only": 1
+  },
+  {
+   "fieldname": "policy_hash",
+   "fieldtype": "Data",
+   "label": "Policy Hash",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_delivery",
+   "fieldtype": "Datetime",
+   "label": "Last Delivery",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_delivery_error",
+   "fieldtype": "Small Text",
+   "label": "Last Delivery Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "agent_heartbeat",
+   "fieldtype": "Datetime",
+   "label": "Agent Heartbeat",
+   "read_only": 1
+  },
+  {
+   "fieldname": "writer_code",
+   "fieldtype": "Data",
+   "label": "Writer Code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "incoming_access_key",
+   "fieldtype": "Data",
+   "label": "Incoming Access Key",
+   "read_only": 1,
+   "hidden": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "incoming_secret",
+   "fieldtype": "Password",
+   "label": "Incoming Secret",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "receiver_registered",
+   "fieldtype": "Check",
+   "label": "Receiver Registered",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "observed_source_head",
+   "fieldtype": "Long Int",
+   "label": "Observed Source Head",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "policy_errors",
+   "label": "Rule Configuration Errors",
+   "fieldtype": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_acknowledged_through",
+   "label": "Remote Verified Source Sequence",
+   "fieldtype": "Long Int",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_received_safe",
+   "label": "Verified Incoming Sequence",
+   "fieldtype": "Long Int",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_checked_at",
+   "label": "Last Stock Check",
+   "fieldtype": "Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_status",
+   "label": "Stock Reconciliation",
+   "fieldtype": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_exception",
+   "label": "Stock Diagnostic",
+   "fieldtype": "Small Text",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_reconciled_at",
+   "fieldtype": "Datetime",
+   "label": "Last Successful Stock Reconciliation",
    "read_only": 1
   }
  ],

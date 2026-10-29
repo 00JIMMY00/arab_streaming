@@ -16,7 +16,8 @@
   "payload_digest",
   "capture_event",
   "event_sequence",
-  "received_on"
+  "received_on",
+  "application_status"
  ],
  "fields": [
   {
@@ -70,6 +71,12 @@
    "fieldname": "received_on",
    "fieldtype": "Datetime",
    "label": "Received On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "application_status",
+   "label": "Application Status",
+   "fieldtype": "Data",
    "read_only": 1
   }
  ],

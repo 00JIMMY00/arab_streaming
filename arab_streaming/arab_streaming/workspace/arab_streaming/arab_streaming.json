@@ -1,0 +1,109 @@
+{
+ "doctype": "Workspace",
+ "name": "Arab Streaming",
+ "label": "Arab Streaming",
+ "title": "Arab Streaming",
+ "module": "Arab Streaming",
+ "public": 1,
+ "is_hidden": 0,
+ "icon": "refresh-cw",
+ "sequence_id": 20,
+ "content": "[{\"id\": \"header\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Arab-ERP Streaming</span>\", \"col\": 12}}, {\"id\": \"shortcuts\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sync Rules\", \"col\": 4}}, {\"id\": \"incoming\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Incoming Events\", \"col\": 4}}, {\"id\": \"outgoing\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Outgoing Events\", \"col\": 4}}]",
+ "shortcuts": [
+  {
+   "type": "DocType",
+   "link_to": "Streaming Rule",
+   "label": "Sync Rules",
+   "doc_view": "List"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Slave Instance",
+   "label": "Branch Connections",
+   "doc_view": "List"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Master Instance",
+   "label": "Master Connection",
+   "doc_view": "List"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Capture Event",
+   "label": "Incoming Events",
+   "doc_view": "List"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Dispatch Event",
+   "label": "Outgoing Events",
+   "doc_view": "List"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Streaming Settings",
+   "label": "Settings",
+   "doc_view": ""
+  }
+ ],
+ "links": [
+  {
+   "type": "Card Break",
+   "label": "Configuration"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Streaming Rule",
+   "label": "Sync Rules"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Slave Instance",
+   "label": "Branch Connections"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Master Instance",
+   "label": "Master Connection"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Capture Event",
+   "label": "Incoming Events"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Dispatch Event",
+   "label": "Outgoing Events"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Streaming Settings",
+   "label": "Settings"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Streaming Value Mapping",
+   "label": "Record Mappings"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Streaming Branch Assignment",
+   "label": "Branch Assignments"
+  }
+ ],
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ]
+}

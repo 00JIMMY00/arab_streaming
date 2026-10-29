@@ -1,0 +1,49 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Protected Version",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "autoname": "hash",
+ "allow_rename": 0,
+ "field_order": [
+  "reference_doctype",
+  "reference_name",
+  "secret_data",
+  "document_digest"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "options": "DocType",
+   "label": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "label": "Record",
+   "reqd": 1
+  },
+  {
+   "fieldname": "secret_data",
+   "fieldtype": "Password",
+   "label": "Encrypted bootstrap values",
+   "hidden": 1
+  },
+  {
+   "fieldname": "document_digest",
+   "fieldtype": "Data",
+   "label": "Document Digest"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1
+  }
+ ]
+}

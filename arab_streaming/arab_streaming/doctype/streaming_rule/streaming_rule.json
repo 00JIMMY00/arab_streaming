@@ -1,0 +1,282 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Rule",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 1,
+ "autoname": "hash",
+ "field_order": [
+  "doctype_name",
+  "enabled",
+  "direction",
+  "scope",
+  "all_branches",
+  "branches",
+  "branch_field",
+  "conditions",
+  "separate_reverse_condition",
+  "reverse_conditions",
+  "priority",
+  "on_duplicated_insert",
+  "sync_events_after_submit",
+  "allow_creation",
+  "lock_documents",
+  "lock_documents_after_submit",
+  "allow_amend",
+  "allow_rename",
+  "prevent_delete",
+  "allow_local_rename",
+  "prevent_local_delete",
+  "include_files",
+  "include_passwords",
+  "field_mappings",
+  "revision",
+  "configuration_hash",
+  "configuration_status",
+  "legacy_source",
+  "event_create",
+  "event_update",
+  "event_submit",
+  "event_cancel",
+  "event_rename",
+  "event_delete"
+ ],
+ "fields": [
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "DocType",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "label": "Direction",
+   "options": "Master to Slave\nSlave to Master\nBoth",
+   "default": "Master to Slave",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "label": "Scope",
+   "options": "Branch\nShared\nAssigned Branches",
+   "default": "Branch",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "all_branches",
+   "fieldtype": "Check",
+   "label": "All Branches",
+   "default": "1"
+  },
+  {
+   "fieldname": "branches",
+   "fieldtype": "Table",
+   "label": "Branches",
+   "options": "Streaming Rule Branch",
+   "depends_on": "eval:!doc.all_branches"
+  },
+  {
+   "fieldname": "branch_field",
+   "fieldtype": "Data",
+   "label": "Branch Field",
+   "description": "Branch link, table.branch link, or linked_document.branch link. Shared records require no Branch."
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Code",
+   "label": "Conditions",
+   "options": "Python",
+   "description": "Optional restricted filter. Blank selects all records within the chosen branch scope."
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority",
+   "default": "100",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "on_duplicated_insert",
+   "fieldtype": "Select",
+   "label": "On Duplicated Insert",
+   "options": "Update\nSkip\nThrow Error",
+   "default": "Update"
+  },
+  {
+   "fieldname": "sync_events_after_submit",
+   "fieldtype": "Check",
+   "label": "Sync Events After Submit",
+   "default": "1"
+  },
+  {
+   "fieldname": "allow_creation",
+   "fieldtype": "Check",
+   "label": "Allow Creation",
+   "default": "1"
+  },
+  {
+   "fieldname": "lock_documents",
+   "fieldtype": "Check",
+   "label": "Lock Documents",
+   "default": "0"
+  },
+  {
+   "fieldname": "lock_documents_after_submit",
+   "fieldtype": "Check",
+   "label": "Lock Documents After Submit",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_amend",
+   "fieldtype": "Check",
+   "label": "Allow Amend",
+   "default": "1"
+  },
+  {
+   "fieldname": "allow_rename",
+   "fieldtype": "Check",
+   "label": "Allow Rename",
+   "default": "1"
+  },
+  {
+   "fieldname": "prevent_delete",
+   "fieldtype": "Check",
+   "label": "Prevent Delete",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_local_rename",
+   "fieldtype": "Check",
+   "label": "Allow Local Rename",
+   "default": "1"
+  },
+  {
+   "fieldname": "prevent_local_delete",
+   "fieldtype": "Check",
+   "label": "Prevent Local Delete",
+   "default": "0"
+  },
+  {
+   "fieldname": "include_files",
+   "fieldtype": "Check",
+   "label": "Include Files",
+   "default": "1"
+  },
+  {
+   "fieldname": "include_passwords",
+   "fieldtype": "Check",
+   "label": "Include Passwords in Initial Copy",
+   "default": "0",
+   "description": "Explicitly copy this business record\u2019s Password fields through an authenticated bootstrap endpoint; values are encrypted under each site\u2019s own key."
+  },
+  {
+   "fieldname": "field_mappings",
+   "fieldtype": "Table",
+   "label": "Field Mappings",
+   "options": "Streaming Field Mapping"
+  },
+  {
+   "fieldname": "revision",
+   "fieldtype": "Long Int",
+   "label": "Revision",
+   "read_only": 1,
+   "default": "1"
+  },
+  {
+   "fieldname": "configuration_hash",
+   "fieldtype": "Data",
+   "label": "Configuration Hash",
+   "read_only": 1
+  },
+  {
+   "fieldname": "configuration_status",
+   "fieldtype": "Small Text",
+   "label": "Configuration Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "legacy_source",
+   "fieldtype": "Data",
+   "label": "Legacy Source",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "separate_reverse_condition",
+   "fieldtype": "Check",
+   "label": "Separate Slave to Master Filter",
+   "default": "0"
+  },
+  {
+   "fieldname": "reverse_conditions",
+   "fieldtype": "Code",
+   "label": "Slave to Master Conditions",
+   "options": "Python",
+   "depends_on": "separate_reverse_condition"
+  },
+  {
+   "fieldname": "event_create",
+   "label": "Create",
+   "fieldtype": "Check",
+   "default": "1"
+  },
+  {
+   "fieldname": "event_update",
+   "label": "Update Draft",
+   "fieldtype": "Check",
+   "default": "1"
+  },
+  {
+   "fieldname": "event_submit",
+   "label": "Submit",
+   "fieldtype": "Check",
+   "default": "1"
+  },
+  {
+   "fieldname": "event_cancel",
+   "label": "Cancel",
+   "fieldtype": "Check",
+   "default": "1"
+  },
+  {
+   "fieldname": "event_rename",
+   "label": "Rename",
+   "fieldtype": "Check",
+   "default": "1"
+  },
+  {
+   "fieldname": "event_delete",
+   "label": "Delete",
+   "fieldtype": "Check",
+   "default": "1"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

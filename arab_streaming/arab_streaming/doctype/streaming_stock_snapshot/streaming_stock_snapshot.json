@@ -1,0 +1,70 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Stock Snapshot",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "allow_rename": 0,
+ "field_order": [
+  "peer_state",
+  "source_sequence",
+  "captured_at",
+  "data",
+  "payload_digest",
+  "direction",
+  "status",
+  "exception"
+ ],
+ "fields": [
+  {
+   "fieldname": "peer_state",
+   "label": "Peer",
+   "fieldtype": "Link",
+   "options": "Streaming Peer State"
+  },
+  {
+   "fieldname": "source_sequence",
+   "label": "Source Sequence",
+   "fieldtype": "Long Int"
+  },
+  {
+   "fieldname": "captured_at",
+   "label": "Captured UTC",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "data",
+   "label": "Branch stock movements",
+   "fieldtype": "JSON"
+  },
+  {
+   "fieldname": "payload_digest",
+   "label": "Digest",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "direction",
+   "label": "Direction",
+   "fieldtype": "Select",
+   "options": "Source\nReceived"
+  },
+  {
+   "fieldname": "status",
+   "label": "Status",
+   "fieldtype": "Select",
+   "options": "Pending\nReconciled\nConflict\nStale"
+  },
+  {
+   "fieldname": "exception",
+   "label": "Diagnostic",
+   "fieldtype": "Small Text"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1
+  }
+ ]
+}

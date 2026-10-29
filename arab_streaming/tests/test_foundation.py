@@ -29,11 +29,11 @@ class TestDispatchStatus(unittest.TestCase):
 					synced = sum(r["synced"] for r in rows)
 					ignored = sum(r["ignore"] for r in rows)
 					expected = (
-						"Synced"
+						"Delivered"
 						if synced == size
 						else "Ignored"
 						if ignored == size
-						else "Partially Synced"
+						else "Partially Delivered"
 						if synced
 						else "Partially Ignored"
 						if ignored
@@ -370,7 +370,7 @@ class TestFoundation(FrappeTestCase):
 			).insert(ignore_permissions=True)
 			event.instances[0].synced = 1
 			event.save(ignore_permissions=True)
-			self.assertEqual(event.status, "Synced")
+			self.assertEqual(event.status, "Delivered")
 			event.data = '{"uom_name":"changed"}'
 			with self.assertRaises(frappe.ValidationError):
 				event.save(ignore_permissions=True)

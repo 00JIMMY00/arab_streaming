@@ -24,7 +24,11 @@
   "prevent_delete",
   "ignore_branch",
   "prevent_local_delete",
-  "allow_local_rename"
+  "allow_local_rename",
+  "scope",
+  "branch_field",
+  "rule_id",
+  "rule_revision"
  ],
  "fields": [
   {
@@ -47,7 +51,10 @@
    "fieldname": "conditions",
    "fieldtype": "Code",
    "label": "Conditions",
-   "options": "Python"
+   "options": "Python",
+   "description": "Optional record filter. Leave blank to send every record of this DocType. Example: doc.name == 'testuom' sends only that name.",
+   "in_list_view": 1,
+   "columns": 4
   },
   {
    "fieldname": "directly_inserted_in_db",
@@ -126,6 +133,28 @@
    "fieldtype": "Check",
    "label": "Allow Local Rename",
    "default": "0"
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "label": "Scope",
+   "options": "\nBranch\nShared",
+   "description": "Blank resolves Branch when a Branch field exists; otherwise Shared for ordinary reference data."
+  },
+  {
+   "fieldname": "branch_field",
+   "fieldtype": "Data",
+   "label": "Branch Field"
+  },
+  {
+   "fieldname": "rule_id",
+   "fieldtype": "Data",
+   "label": "Rule Id"
+  },
+  {
+   "fieldname": "rule_revision",
+   "fieldtype": "Long Int",
+   "label": "Rule Revision"
   }
  ],
  "permissions": [],

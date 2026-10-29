@@ -19,7 +19,14 @@
   "pairing_generation",
   "payload_digest",
   "next_attempt_at",
-  "attempts"
+  "attempts",
+  "exception",
+  "receiver_status",
+  "capture_event",
+  "receiver_exception",
+  "receiver_retries",
+  "receiver_next_attempt_at",
+  "status_checked_at"
  ],
  "fields": [
   {
@@ -33,7 +40,7 @@
   {
    "fieldname": "synced",
    "fieldtype": "Check",
-   "label": "Synced",
+   "label": "Delivered",
    "default": "0",
    "read_only": 1,
    "in_list_view": 1
@@ -51,7 +58,8 @@
    "label": "Instance Name",
    "options": "instance_type",
    "reqd": 1,
-   "read_only": 1
+   "read_only": 1,
+   "in_list_view": 1
   },
   {
    "fieldname": "doctype_config",
@@ -101,6 +109,50 @@
    "label": "Attempts",
    "default": "0",
    "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "exception",
+   "fieldtype": "Small Text",
+   "label": "Delivery Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "receiver_status",
+   "label": "Receiver Status",
+   "fieldtype": "Select",
+   "options": "\nPending\nSuccess\nFailed\nSkipped\nIgnored\nUnavailable",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "capture_event",
+   "label": "Remote Capture Event",
+   "fieldtype": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "receiver_exception",
+   "label": "Receiver Error",
+   "fieldtype": "Small Text",
+   "read_only": 1
+  },
+  {
+   "fieldname": "receiver_retries",
+   "label": "Receiver Retries",
+   "fieldtype": "Int",
+   "read_only": 1
+  },
+  {
+   "fieldname": "receiver_next_attempt_at",
+   "label": "Receiver Next Attempt",
+   "fieldtype": "Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status_checked_at",
+   "label": "Receiver Status Checked At",
+   "fieldtype": "Datetime",
    "read_only": 1
   }
  ],

@@ -1,0 +1,55 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Event Dependency",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "autoname": "hash",
+ "field_order": [
+  "dispatch_event",
+  "reference_doctype",
+  "reference_name",
+  "document_version"
+ ],
+ "fields": [
+  {
+   "fieldname": "dispatch_event",
+   "fieldtype": "Link",
+   "label": "Dispatch Event",
+   "options": "Dispatch Event",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference Doctype",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "label": "Reference Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "document_version",
+   "fieldtype": "Link",
+   "label": "Document Version",
+   "options": "Streaming Document Version",
+   "reqd": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

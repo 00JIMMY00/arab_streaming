@@ -5,6 +5,14 @@ from arab_streaming.streaming.validation import validate_json_object
 
 
 class CaptureEvent(ManagedDocument):
+	def onload(self):
+		self.set_onload("event_sequence_text", str(self.event_sequence or 0))
+
+	def on_update(self):
+		from arab_streaming.streaming.feedback import remember_result
+
+		remember_result(self)
+
 	def validate(self):
 		super().validate()
 		if self.instance_type not in ("Master Instance", "Slave Instance"):

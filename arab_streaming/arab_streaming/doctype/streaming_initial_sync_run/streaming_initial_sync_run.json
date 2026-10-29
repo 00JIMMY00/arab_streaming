@@ -19,7 +19,10 @@
   "lease_token",
   "lease_expires_at",
   "manifest_expires_at",
-  "checkpoints"
+  "checkpoints",
+  "remote_export",
+  "configuration",
+  "history_drained"
  ],
  "fields": [
   {
@@ -59,7 +62,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "In Progress\nFailed\nComplete",
+   "options": "In Progress\nFailed\nComplete\nAbandoned",
    "default": "In Progress",
    "read_only": 1
   },
@@ -94,6 +97,26 @@
    "label": "Checkpoints",
    "options": "Streaming Sync Checkpoint",
    "read_only": 1
+  },
+  {
+   "fieldname": "remote_export",
+   "label": "Remote Export",
+   "fieldtype": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "configuration",
+   "label": "Configuration",
+   "fieldtype": "Code",
+   "read_only": 1,
+   "options": "JSON"
+  },
+  {
+   "fieldname": "history_drained",
+   "label": "History Drained",
+   "fieldtype": "Check",
+   "read_only": 1,
+   "default": "0"
   }
  ],
  "permissions": [

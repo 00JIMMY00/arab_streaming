@@ -8,6 +8,18 @@ from arab_streaming.streaming.validation import normalize_site_url, validate_rul
 
 
 class MasterInstance(Document):
+	def get_invalid_links(self, is_submittable=False):
+		branch = self.restaurant_branch
+		invalid, cancelled = super().get_invalid_links(is_submittable=is_submittable)
+		if self.slave_name and frappe.db.exists(
+			"Streaming Peer State", {"instance_type": "Master Instance", "instance_name": self.name}
+		):
+			# Frappe also clears a missing Link's value while validating it.
+			# Preserve only this authenticated remote identity until bootstrap.
+			self.restaurant_branch = branch
+			invalid = [item for item in invalid if item[0] != "restaurant_branch"]
+		return invalid, cancelled
+
 	def before_insert(self):
 		require_role("Slave")
 		self.connection_status = "Disconnected"
@@ -58,6 +70,10 @@ class MasterInstance(Document):
 		)
 		previous = self.get_doc_before_save()
 		if previous and not system_write_active():
+			if previous.slave_name and self.execution_user != previous.execution_user:
+				frappe.throw(
+					"A linked Execution User cannot change without an explicit pairing reauthorization"
+				)
 			old_rows = {r.name: r for r in previous.initial_sync_doctypes}
 			for row in self.initial_sync_doctypes:
 				old = old_rows.get(row.name)

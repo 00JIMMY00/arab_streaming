@@ -12,6 +12,9 @@ def after_install():
 
 def after_migrate():
 	ensure_configuration()
+	from arab_streaming.streaming.feedback import migrate_delivery_labels
+
+	migrate_delivery_labels()
 
 
 def ensure_configuration():
@@ -47,10 +50,25 @@ def ensure_configuration():
 	if not frappe.db.sql("SELECT 1 FROM tabSingles WHERE doctype=%s LIMIT 1", ("Streaming Settings",)):
 		frappe.get_doc("Streaming Settings").save(ignore_permissions=True)
 	ensure_indexes()
+	from arab_streaming.streaming.policy import ensure_dimension, migrate_legacy_rules, migrate_rule_contract
+
+	if frappe.conf.get("arab_streaming_site_role") in ("Master", "Slave"):
+		ensure_dimension()
+	migrate_legacy_rules()
+	migrate_rule_contract()
+	from arab_streaming.streaming.permissions import refresh_site
+
+	refresh_site()
 
 
 def ensure_indexes():
 	unique = {
+		"Streaming Event Dependency": ["dispatch_event", "reference_doctype", "reference_name"],
+		"Streaming Snapshot Item": ["export", "row_key", "position"],
+		"Streaming Record State": ["peer_state", "reference_doctype", "remote_name"],
+		"Streaming Rule Revision": ["rule", "revision"],
+		"Streaming Value Mapping": ["instance_type", "instance_name", "reference_doctype", "remote_name"],
+		"Streaming Branch Assignment": ["reference_doctype", "reference_name"],
 		"Capture Event": [
 			"source_installation_id",
 			"pairing_id",
@@ -75,6 +93,12 @@ def ensure_indexes():
 			frappe.db.commit()
 			quoted = ", ".join(f"`{column}`" for column in columns)
 			frappe.db.sql_ddl(f"ALTER TABLE `tab{doctype}` ADD UNIQUE INDEX `streaming_identity` ({quoted})")
+	if not frappe.db.has_index("tabStreaming Event Receipt", "streaming_sequence_identity"):
+		frappe.db.commit()
+		frappe.db.sql_ddl(
+			"ALTER TABLE `tabStreaming Event Receipt` ADD UNIQUE INDEX `streaming_sequence_identity` "
+			"(`source_installation_id`, `pairing_id`, `pairing_generation`, `event_sequence`)"
+		)
 	indexes = {
 		"Capture Event": [
 			(["instance_type", "instance_name", "status", "event_sequence"], "streaming_pending"),

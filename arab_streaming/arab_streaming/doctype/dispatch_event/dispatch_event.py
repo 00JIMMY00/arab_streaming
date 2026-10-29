@@ -6,6 +6,22 @@ from arab_streaming.streaming.validation import validate_json_object
 
 
 class DispatchEvent(ManagedDocument):
+	def onload(self):
+		self.set_onload("event_sequence_text", str(self.event_sequence or 0))
+		from urllib.parse import quote
+
+		from arab_streaming.streaming.validation import normalize_site_url
+
+		urls = {}
+		for row in self.instances:
+			if row.capture_event:
+				domain = frappe.db.get_value(row.instance_type, row.instance_name, "domain")
+				if domain:
+					urls[row.name] = (
+						normalize_site_url(domain) + "/app/capture-event/" + quote(row.capture_event, safe="")
+					)
+		self.set_onload("receiver_urls", urls)
+
 	def validate(self):
 		super().validate()
 		validate_json_object(self.metadata)

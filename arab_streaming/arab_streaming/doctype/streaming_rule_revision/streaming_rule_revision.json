@@ -1,0 +1,58 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Rule Revision",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "autoname": "hash",
+ "field_order": [
+  "rule",
+  "revision",
+  "configuration",
+  "configuration_hash"
+ ],
+ "fields": [
+  {
+   "fieldname": "rule",
+   "fieldtype": "Link",
+   "label": "Rule",
+   "options": "Streaming Rule",
+   "reqd": 1
+  },
+  {
+   "fieldname": "revision",
+   "fieldtype": "Long Int",
+   "label": "Revision",
+   "reqd": 1
+  },
+  {
+   "fieldname": "configuration",
+   "fieldtype": "Code",
+   "label": "Configuration",
+   "options": "JSON",
+   "reqd": 1
+  },
+  {
+   "fieldname": "configuration_hash",
+   "fieldtype": "Data",
+   "label": "Configuration Hash",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

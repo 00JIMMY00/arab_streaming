@@ -9,6 +9,7 @@
  "track_changes": 1,
  "allow_rename": 0,
  "field_order": [
+  "connection_tab",
   "restaurant_branch",
   "domain",
   "api_key",
@@ -16,10 +17,18 @@
   "enabled",
   "streaming_version",
   "metadata",
+  "outgoing_tab",
+  "streaming_rules_summary",
   "syncing_doctypes",
+  "diagnostics_tab",
   "receiving_doctypes_data"
  ],
  "fields": [
+  {
+   "fieldname": "connection_tab",
+   "fieldtype": "Tab Break",
+   "label": "Connection"
+  },
   {
    "fieldname": "restaurant_branch",
    "fieldtype": "Link",
@@ -73,15 +82,33 @@
   {
    "fieldname": "syncing_doctypes",
    "fieldtype": "Table",
-   "label": "Syncing Doctypes",
-   "options": "Instance Syncing Doctype"
+   "label": "Automatic changes: master \u2192 this slave",
+   "options": "Instance Syncing Doctype",
+   "description": "Add Item or UOM here to send changes made on this master to this slave. Conditions blank = every record of that DocType. Save; future changes are queued automatically. To copy older records, use Copy Existing Records on the slave Master Instance.",
+   "hidden": 1,
+   "read_only": 1
   },
   {
    "fieldname": "receiving_doctypes_data",
    "fieldtype": "Code",
-   "label": "Receiving Doctypes Data",
+   "label": "Rules received from slave (diagnostics)",
    "options": "JSON",
-   "read_only": 1
+   "read_only": 1,
+   "description": "Read-only information refreshed by Ping from the slave. Configure slave \u2192 master rules on the slave Master Instance."
+  },
+  {
+   "fieldname": "outgoing_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sync Rules"
+  },
+  {
+   "fieldname": "diagnostics_tab",
+   "fieldtype": "Tab Break",
+   "label": "Advanced"
+  },
+  {
+   "fieldname": "streaming_rules_summary",
+   "fieldtype": "HTML"
   }
  ],
  "permissions": [

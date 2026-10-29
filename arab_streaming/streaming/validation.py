@@ -46,10 +46,18 @@ def normalize_site_url(value):
 
 
 def validate_rules(doc):
-	# Executable conditions remain disabled until the shared restricted parser is implemented.
+	from arab_streaming.streaming.adapters import condition_fields, validate_config
+	from arab_streaming.streaming.conditions import ConditionError, parse
+
 	for table in ("initial_sync_doctypes", "syncing_doctypes"):
 		seen = set()
 		for row in doc.get(table) or []:
+			try:
+				parse(row.conditions, condition_fields(row.doctype_name))
+			except ConditionError as exc:
+				frappe.throw(str(exc))
+			if table == "syncing_doctypes":
+				validate_config(row)
 			if row.doctype_name in seen:
 				frappe.throw("A DocType can appear only once in each streaming configuration table")
 			seen.add(row.doctype_name)
