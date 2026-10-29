@@ -260,6 +260,11 @@ def check_source(doc):
 
 def authorize_document(peer, document, incoming=False, config=None, dependency=False):
 	config = config or config_for(peer, document["doctype"], incoming)
+	if not config and dependency:
+		# Shared references remain global when a Branch field is added for UI consistency.
+		reverse = config_for(peer, document["doctype"], not incoming)
+		if reverse and reverse.get("scope") == "Shared":
+			config = reverse
 	if not config:
 		if dependency:
 			path = discover_branch_field(document["doctype"])

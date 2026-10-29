@@ -11,6 +11,28 @@ from arab_streaming.streaming.policy import authorize_document, direction_allowe
 
 
 class TestDynamicRules(FrappeTestCase):
+	def test_shared_reference_branch_field_does_not_restrict_dependency(self):
+		from arab_streaming.streaming import policy
+
+		peer = frappe._dict(restaurant_branch="branch-a")
+		document = dict(doctype="Item", name="global-item", custom_streaming_branch=None)
+		shared = frappe._dict(scope="Shared")
+		with patch.object(policy, "config_for", side_effect=[None, shared]):
+			policy.authorize_document(peer, document, dependency=True)
+		# A reverse rule cannot authorize an ordinary root event.
+		with patch.object(policy, "config_for", return_value=None):
+			with self.assertRaises(frappe.PermissionError):
+				policy.authorize_document(peer, document)
+		# Absent, disabled or other-Branch shared rules resolve to None, retaining isolation.
+		for reverse in (None, frappe._dict(scope="Branch")):
+			with (
+				patch.object(policy, "config_for", side_effect=[None, reverse]),
+				patch.object(policy, "discover_branch_field", return_value="custom_streaming_branch"),
+				patch.object(policy, "matches_scope", return_value=False),
+			):
+				with self.assertRaises(frappe.PermissionError):
+					policy.authorize_document(peer, document, dependency=True)
+
 	def test_translated_doctype_link_search(self):
 		from frappe.desk.search import search_link
 
