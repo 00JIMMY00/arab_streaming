@@ -153,6 +153,8 @@ def apply_document(
 	apply_passwords(doc, password_values)
 	if meta.has_field("set_posting_time"):
 		doc.set_posting_time = 1
+	if doctype == "User":
+		doc.flags.no_welcome_mail = True
 	if doctype == "Item":
 		doc.flags.dont_update_variants = True
 	if target:

@@ -14,7 +14,6 @@ BLOCKED_TYPES = frozenset(
 		"DocType Link",
 		"Custom Field",
 		"Property Setter",
-		"User",
 		"Role",
 		"Has Role",
 		"User Permission",
@@ -64,6 +63,7 @@ def is_business_doctype(doctype):
 		meta.module
 		in ("Core", "Email", "Desk", "Custom", "Automation", "Integrations", "Printing", "Workflow")
 		and not meta.custom
+		and doctype != "User"
 	):
 		return False
 	return not meta.issingle
@@ -88,6 +88,24 @@ SAFE_TYPES = BusinessTypes()  # Backward-compatible import; membership is dynami
 # Item creation helpers generate independent prices/stock transactions. These
 # and calculated/local operational values are not part of catalog replication.
 LOCAL_FIELDS = {
+	"User": frozenset(
+		{
+			"new_password",
+			"api_key",
+			"api_secret",
+			"reset_password_key",
+			"last_reset_password_key_generated_on",
+			"last_password_reset_date",
+			"last_active",
+			"last_login",
+			"last_ip",
+			"last_known_versions",
+			"social_logins",
+			"user_emails",
+			"send_welcome_email",
+			"logout_all_sessions",
+		}
+	),
 	"Item": frozenset(
 		{
 			"opening_stock",
@@ -99,7 +117,7 @@ LOCAL_FIELDS = {
 			"default_item_manufacturer",
 			"default_manufacturer_part_no",
 		}
-	)
+	),
 }
 
 

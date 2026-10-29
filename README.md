@@ -1,5 +1,11 @@
 # Arab-ERP Streaming
 
+## User synchronization — 2026-10-29
+
+User records can be selected in Streaming Rules and copied in either configured direction, using Shared scope for centrally shared accounts. Missing linked Users are included in new immutable dependency manifests and fetched through the existing dependency path. Normal User validation and installed Role references apply; this does not publish Role definitions or User Permission records.
+
+User identity, enabled state, profile fields and role assignments are synchronized. Passwords, API credentials, password-reset tokens, social login identities, mailbox settings and login/session history stay local. Synchronization sends no welcome email. Existing target credentials remain unchanged. Existing failed events retain their original frozen manifests; an older missing User must be copied separately before retrying that event.
+
 ## Branch fields and shared references — 2026-10-29
 
 A Branch Link field can exist on a Shared reference DocType without changing its routing. When fetching a dependency from an enabled Shared rule for the paired Branch, the reference stays Shared even if that rule's normal event direction is the reverse direction. Ordinary root events still require their configured direction; Branch-scoped dependencies still require the authenticated Branch.
@@ -35,7 +41,7 @@ The rule selector now correctly searches the full eligible translated DocType li
 
 **Ping** checks connectivity. **Copy Existing Records** explicitly backfills older data; it is separate from automatic delivery of new changes. Conditions left blank include every qualifying record. Existing named-test conditions are preserved during migration. On the current pair, the approved test configuration now uses Both/Shared UOM with blank conditions; Item Group retains its named-test condition.
 
-The engine uses metadata rather than a fixed business DocType list, normal document permissions/controllers, stable child identities, immutable event/dependency/file versions, durable receipts, per-record conflicts, and normal submit/cancel behavior. Framework/authentication records and generated GL/stock rows are not independent business roots. Compatible Company/Warehouse/account setup or explicit **Streaming Value Mapping** is required for transactions; the engine does not infer accounting identities.
+The engine uses metadata rather than a fixed business DocType list, normal document permissions/controllers, stable child identities, immutable event/dependency/file versions, durable receipts, per-record conflicts, and normal submit/cancel behavior. User accounts are supported; other framework/authentication records and generated GL/stock rows are not independent business roots. Compatible Company/Warehouse/account setup or explicit **Streaming Value Mapping** is required for transactions; the engine does not infer accounting identities.
 
 A dedicated, supervised site agent polls healthy peers every second; after-commit jobs also wake delivery. The minute scheduler is recovery. Both sites need the same release and an approved non-Administrator execution user. Start an agent from a bench sites directory with `../env/bin/python -m arab_streaming.agent --site SITE` and supervise it with a service manager. Business saves perform no network requests.
 

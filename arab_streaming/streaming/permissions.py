@@ -47,7 +47,8 @@ def provision(user, rules):
 			wanted[(dt, level)] = dict(
 				read=1,
 				create=1,
-				write=int(dt in roots),
+				# User roles are level 1; retain them on create without granting level-0 edits.
+				write=int(dt in roots or (dt == "User" and level > 0)),
 				delete=int(dt in roots),
 				submit=int(bool(meta.is_submittable)),
 				cancel=int(bool(meta.is_submittable)),

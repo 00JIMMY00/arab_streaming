@@ -49,7 +49,7 @@ class TestDynamicRules(FrappeTestCase):
 				self.assertIn(expected, [row["value"] for row in results])
 		results = search_link("DocType", "customer", query=query, page_length=1)
 		self.assertEqual([row["value"] for row in results], ["Customer"])
-		self.assertNotIn("User", [row["value"] for row in search_link("DocType", "user", query=query)])
+		self.assertIn("User", [row["value"] for row in search_link("DocType", "user", query=query)])
 
 	def setUp(self):
 		self.user = frappe.session.user
@@ -69,6 +69,7 @@ class TestDynamicRules(FrappeTestCase):
 
 	def test_sales_invoice_and_other_business_types_are_dynamic(self):
 		for dt in [
+			"User",
 			"Sales Invoice",
 			"Purchase Invoice",
 			"Sales Order",
@@ -78,7 +79,7 @@ class TestDynamicRules(FrappeTestCase):
 			"Item Price",
 		]:
 			self.assertEqual(require_supported(dt).name, dt)
-		for dt in ["User", "DocType", "GL Entry", "Stock Ledger Entry", "Bin", "Capture Event"]:
+		for dt in ["Role", "DocType", "GL Entry", "Stock Ledger Entry", "Bin", "Capture Event"]:
 			with self.assertRaises(frappe.ValidationError):
 				require_supported(dt)
 

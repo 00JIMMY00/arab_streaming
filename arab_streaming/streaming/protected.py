@@ -10,6 +10,8 @@ from arab_streaming.streaming.guards import system_write
 
 
 def freeze(document):
+	if document["doctype"] == "User":
+		return None
 	values = []
 
 	def walk(doc):
@@ -77,6 +79,8 @@ def fetch(peer, state, export, doctype, name):
 
 
 def import_values(peer, document, export):
+	if document["doctype"] == "User":
+		return []
 	if not export:
 		return []
 	from arab_streaming.streaming.policy import config_for
