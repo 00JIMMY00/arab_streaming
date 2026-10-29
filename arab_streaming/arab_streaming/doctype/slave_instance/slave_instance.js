@@ -11,6 +11,7 @@ frappe.ui.form.on('Slave Instance', {
 			if (frm.fields_dict[table]) frm.set_query('doctype_name', table, () => ({query: "arab_streaming.api.rules.doctype_query"}));
 		}
 		if (frm.is_new()) return;
+		frm.add_custom_button(__('Copy Existing Records'), () => frappe.set_route('List', 'Streaming Rule'));
         frm.add_custom_button(__('Reconcile Stock'), () => frappe.call({method:'arab_streaming.api.actions.reconcile_stock', args:{doctype:frm.doctype,name:frm.doc.name}, freeze:true, callback:r=>frappe.msgprint(JSON.stringify(r.message))}), __('Events'));
 		frm.dashboard.set_headline(__('Choose DocType, direction and Branch in Sync Rules. Saved business changes synchronize automatically.'));
 		if (frappe.session.user !== 'Administrator') return;

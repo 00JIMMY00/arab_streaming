@@ -80,6 +80,9 @@ def process(instance_type, name):
 		return
 	if not synchronize_policy(peer):
 		return
+	from arab_streaming.streaming.copying import advance
+
+	advance(peer)
 	if instance_type == "Master Instance":
 		exchange(peer)
 	else:

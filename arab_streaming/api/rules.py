@@ -163,36 +163,7 @@ def connection_summary(doctype, name):
 @frappe.whitelist(methods=["POST"])
 def copy_existing(name):
 	frappe.only_for("System Manager")
-	from arab_streaming.streaming.client import remote_call
-	from arab_streaming.streaming.configuration import require_role
-	from arab_streaming.streaming.connections import wire_identity
-
-	require_role("Master")
-	rule = frappe.get_doc("Streaming Rule", name)
-	rule.check_permission("read")
-	if not rule.enabled or rule.direction == "Slave to Master":
-		frappe.throw("Enable a Master to Slave or Both rule before copying master records")
-	result = []
-	for peername in frappe.get_all(
-		"Slave Instance", filters={"enabled": 1, "connection_status": "Connected"}, pluck="name"
-	):
-		peer = frappe.get_doc("Slave Instance", peername)
-		if not rule.all_branches and peer.restaurant_branch not in [r.branch for r in rule.branches]:
-			continue
-		try:
-			from arab_streaming.streaming.delivery import synchronize_policy
-
-			synchronize_policy(peer, force=True)
-			data = remote_call(
-				peer,
-				"arab_streaming.api.bootstrap.start_copy",
-				**wire_identity(peer),
-				doctypes=[rule.doctype_name],
-			)
-			result.append(dict(branch=peer.restaurant_branch, **data))
-		except Exception as exc:
-			result.append(dict(branch=peer.restaurant_branch, error=str(exc)[:1000]))
-	return {"branches": result}
+	frappe.throw("Open the saved Streaming Rule and choose Copy Existing Records to preview direction, Branch and record count.")
 
 
 @frappe.whitelist()

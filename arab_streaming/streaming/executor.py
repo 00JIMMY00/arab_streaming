@@ -32,6 +32,14 @@ def apply_document(
 	from arab_streaming.streaming.policy import config_for
 
 	config = config_for(peer, document["doctype"], incoming=True) if peer.get("restaurant_branch") else None
+	# A preserve-existing copy needs no attachment/password/dependency transfers.
+	if policy == "Skip":
+		from arab_streaming.streaming.mapping import mapped_name
+
+		local_name = mapped_name(peer, document["doctype"], document["name"])
+		if frappe.db.exists(document["doctype"], local_name):
+			frappe.get_doc(document["doctype"], local_name).check_permission("read")
+			return "Skipped", "Existing target preserved by Skip policy"
 	from arab_streaming.streaming.protected import apply as apply_passwords
 	from arab_streaming.streaming.protected import import_values
 
@@ -187,10 +195,14 @@ def apply_capture(capture, peer):
 				frappe.throw("Update target is missing; its earlier Create must be applied first")
 			if capture.event_type == "Cancel" and data["document"].get("docstatus") != 2:
 				frappe.throw("Cancel must carry the cancelled source state")
+			metadata = frappe.parse_json(capture.metadata or "{}")
+			policy = config.get("on_duplicated_insert") or "Update"
+			if metadata.get("copy_run") and metadata.get("preserve_existing") == 1:
+				policy = "Skip"  # A copy may only tighten the published overwrite policy.
 			return apply_document(
 				peer,
 				data["document"],
-				config.get("on_duplicated_insert") or "Update",
+				policy,
 				base_digest=config.get("expected_remote_base") or data.get("base_digest")
 				if capture.event_type in ("Update", "Cancel")
 				else None,

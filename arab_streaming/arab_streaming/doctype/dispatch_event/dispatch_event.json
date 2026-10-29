@@ -20,7 +20,8 @@
   "event_sequence",
   "created_by",
   "document_event",
-  "payload_digest"
+  "payload_digest",
+  "copy_run"
  ],
  "fields": [
   {
@@ -110,6 +111,14 @@
    "label": "Payload Digest",
    "hidden": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "copy_run",
+   "label": "Copy Run",
+   "fieldtype": "Link",
+   "options": "Streaming Copy Run",
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "permissions": [

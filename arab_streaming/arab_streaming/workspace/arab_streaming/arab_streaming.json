@@ -45,6 +45,12 @@
    "link_to": "Streaming Settings",
    "label": "Settings",
    "doc_view": ""
+  },
+  {
+   "type": "DocType",
+   "link_to": "Streaming Copy Run",
+   "label": "Copy Runs",
+   "doc_view": "List"
   }
  ],
  "links": [
@@ -99,6 +105,12 @@
    "link_type": "DocType",
    "link_to": "Streaming Branch Assignment",
    "label": "Branch Assignments"
+  },
+  {
+   "type": "Link",
+   "link_type": "DocType",
+   "link_to": "Streaming Copy Run",
+   "label": "Copy Runs"
   }
  ],
  "roles": [

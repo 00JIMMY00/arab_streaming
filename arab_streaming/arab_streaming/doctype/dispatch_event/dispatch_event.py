@@ -38,6 +38,7 @@ class DispatchEvent(ManagedDocument):
 				"created_by",
 				"document_event",
 				"payload_digest",
+				"copy_run",
 			),
 		)
 		previous = self.get_doc_before_save()

@@ -1,0 +1,246 @@
+{
+ "doctype": "DocType",
+ "name": "Streaming Copy Run",
+ "module": "Arab Streaming",
+ "custom": 0,
+ "engine": "InnoDB",
+ "istable": 0,
+ "issingle": 0,
+ "track_changes": 0,
+ "allow_rename": 0,
+ "autoname": "hash",
+ "field_order": [
+  "rule",
+  "reference_doctype",
+  "direction",
+  "branch",
+  "status",
+  "existing_policy",
+  "queued_records",
+  "applied_records",
+  "skipped_records",
+  "failed_records",
+  "pending_records",
+  "scanned_records",
+  "scan_complete",
+  "source_url",
+  "destination_url",
+  "requested_by",
+  "started_at",
+  "finished_at",
+  "exception",
+  "instance_type",
+  "instance_name",
+  "pairing_id",
+  "pairing_generation",
+  "request_id",
+  "last_name",
+  "configuration"
+ ],
+ "fields": [
+  {
+   "fieldname": "rule",
+   "label": "Streaming Rule",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "Streaming Rule",
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "label": "DocType",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "DocType",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "direction",
+   "label": "Direction",
+   "fieldtype": "Select",
+   "read_only": 1,
+   "options": "Master to Slave\nSlave to Master",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "branch",
+   "label": "Branch",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "Branch",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "label": "Status",
+   "fieldtype": "Select",
+   "read_only": 1,
+   "options": "Queued\nCopying\nWaiting\nNeeds Attention\nComplete\nFailed\nStopped",
+   "default": "Queued",
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "existing_policy",
+   "label": "Existing Records",
+   "fieldtype": "Select",
+   "read_only": 1,
+   "options": "Skip\nRule",
+   "default": "Skip",
+   "description": "Skip preserves destination records. Rule follows the rule\u2019s existing-record policy."
+  },
+  {
+   "fieldname": "queued_records",
+   "label": "Records Queued",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "applied_records",
+   "label": "Applied",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "skipped_records",
+   "label": "Preserved / Skipped",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "failed_records",
+   "label": "Failed / Ignored",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "pending_records",
+   "label": "Awaiting Delivery or Application",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "scanned_records",
+   "label": "Source Records Examined",
+   "fieldtype": "Int",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "scan_complete",
+   "label": "Source Scan Complete",
+   "fieldtype": "Check",
+   "read_only": 1,
+   "default": 0
+  },
+  {
+   "fieldname": "source_url",
+   "label": "Source Site",
+   "fieldtype": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "destination_url",
+   "label": "Destination Site",
+   "fieldtype": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "requested_by",
+   "label": "Requested By",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "User"
+  },
+  {
+   "fieldname": "started_at",
+   "label": "Source Selection Boundary",
+   "fieldtype": "Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finished_at",
+   "label": "Finished At",
+   "fieldtype": "Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "exception",
+   "label": "Error",
+   "fieldtype": "Small Text",
+   "read_only": 1
+  },
+  {
+   "fieldname": "instance_type",
+   "label": "Instance Type",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "options": "DocType",
+   "hidden": 1
+  },
+  {
+   "fieldname": "instance_name",
+   "label": "Instance Name",
+   "fieldtype": "Dynamic Link",
+   "read_only": 1,
+   "options": "instance_type",
+   "hidden": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "pairing_id",
+   "label": "Pairing Id",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "pairing_generation",
+   "label": "Pairing Generation",
+   "fieldtype": "Long Int",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "request_id",
+   "label": "Request Id",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "unique": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "last_name",
+   "label": "Last Source Name",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "configuration",
+   "label": "Rule Snapshot",
+   "fieldtype": "Code",
+   "read_only": 1,
+   "options": "JSON",
+   "hidden": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "create": 0,
+   "write": 0,
+   "delete": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

@@ -51,13 +51,14 @@ frappe.ui.form.on('Master Instance', {
 			if (frm.doc.syncing_status === 'In Progress') {
 				frm.add_custom_button(__('Initial Sync Failed'), () => frappe.confirm(
 					__('Stop this initial copy? Committed records will remain. You can Continue afterward.'),
-					() => action('fail_sync')), __('Copy Existing Records'));
-			} else {
-				if (frm.doc.syncing_status === 'Failed') frm.add_custom_button(__('Restart Copy'), () => action('restart_sync'), __('Copy Existing Records'));
-				frm.add_custom_button(__('Count Records'), () => action('count'), __('Copy Existing Records'));
+					() => action('fail_sync')), __('Previous Master Copy'));
+			} else if (frm.doc.syncing_status === 'Failed') {
+				if (frm.doc.syncing_status === 'Failed') frm.add_custom_button(__('Restart Copy'), () => action('restart_sync'), __('Previous Master Copy'));
+				frm.add_custom_button(__('Count Records'), () => action('count'), __('Previous Master Copy'));
 				frm.add_custom_button(__(frm.doc.syncing_status === 'Failed' ? 'Continue' : 'Sync'),
-					() => action(frm.doc.syncing_status === 'Failed' ? 'continue_sync' : 'sync'), __('Copy Existing Records'));
+					() => action(frm.doc.syncing_status === 'Failed' ? 'continue_sync' : 'sync'), __('Previous Master Copy'));
 			}
+			frm.add_custom_button(__('Copy Existing Records'), () => frappe.set_route('List', 'Streaming Rule'));
 			frm.add_custom_button(__('Fetch Remote Events'), () => action('fetch'), __('Events'));
 			frm.add_custom_button(__('Execute Pending Events'), () => action('execute'), __('Events'));
 			frm.add_custom_button(__('Disconnect'), () => action('disconnect'), __('Connection'));
@@ -66,7 +67,7 @@ frappe.ui.form.on('Master Instance', {
 			doctype: 'Master Instance', enabled: frm.doc.enabled ? 0 : 1
 		}), __('Connection'));
 		frm.dashboard.set_headline(frm.doc.connection_status === 'Connected'
-			? __('Sync Rules on the master controls both directions. Saved business changes synchronize automatically. Copy Existing Records copies older data.')
+			? __('Sync Rules on the master controls both directions. Saved business changes synchronize automatically. For older records, open a Streaming Rule and choose Copy Existing Records.')
 			: __('Save the connection details and Execution User, then use Connection → Link.'));
 	}
 });

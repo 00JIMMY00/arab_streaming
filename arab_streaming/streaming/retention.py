@@ -37,6 +37,9 @@ def cleanup():
 				if not safe_to_remove(frappe.get_doc(doctype, name)):
 					continue
 				if doctype == "Dispatch Event":
+					run = frappe.db.get_value("Dispatch Event", name, "copy_run")
+					if run and frappe.db.get_value("Streaming Copy Run", run, "status") not in ("Complete", "Stopped"):
+						continue
 					# Export boundaries rely on addressed history until their explicit release.
 					if frappe.db.exists("Streaming Export", {"status": "In Progress"}):
 						continue

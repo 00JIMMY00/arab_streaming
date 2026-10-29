@@ -10,6 +10,7 @@ WIRE_METHODS = frozenset(
 	f"arab_streaming.api.{module}.{method}"
 	for module, methods in {
 		"connection": ("capabilities", "branches", "link", "ping", "disconnect"),
+		"copy": ("source_preview", "source_start", "source_progress", "source_control"),
 		"events": ("receive", "pending", "acknowledge", "results", "retry"),
 		"bootstrap": (
 			"count",

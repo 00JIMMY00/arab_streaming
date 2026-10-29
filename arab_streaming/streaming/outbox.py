@@ -173,6 +173,12 @@ def capture(doc, method=None, *args):
 		data["base_digest"] = digest(before)
 		data["changes"] = {k: v for k, v in data["document"].items() if before.get(k) != v}
 		data["removed_fields"] = [k for k in before if k not in data["document"]]
+	return store_event(doc, operation, selected, data=data, method=method)
+
+
+def store_event(doc, operation, selected, data=None, copy_run=None, preserve_existing=False, method=None):
+	"""Persist one explicit snapshot using the same immutable outbox as normal saves."""
+	data = data if data is not None else {"document": snapshot(doc)}
 	from arab_streaming.streaming.dependencies import freeze, persist
 
 	versions = freeze(data["document"]) if frappe.db.exists("DocType", "Streaming Document Version") else []
@@ -187,9 +193,15 @@ def capture(doc, method=None, *args):
 				reference_doctype=doc.doctype,
 				reference_name=doc.name,
 				event_type=operation,
+				copy_run=copy_run,
 				data=json.dumps(data, ensure_ascii=False),
 				metadata={
 					"engine": 2,
+					**(
+						{"copy_run": copy_run, "preserve_existing": int(preserve_existing)}
+						if copy_run
+						else {}
+					),
 					"files": files,
 					"origin_site": frappe.db.get_value("Streaming Site State", "local", "installation_id"),
 					"origin_document": doc.name,
@@ -197,7 +209,7 @@ def capture(doc, method=None, *args):
 				created_on=frappe.utils.now_datetime(),
 				event_sequence=sequence,
 				created_by=frappe.session.user,
-				document_event=method,
+				document_event=method or "initial_copy",
 				instances=[
 					dict(
 						instance_type=peer.doctype,
@@ -216,3 +228,5 @@ def capture(doc, method=None, *args):
 	from arab_streaming.tasks import wakeup
 
 	frappe.db.after_commit.add(wakeup)
+
+	return event
