@@ -136,6 +136,9 @@ def capture(doc, method=None, *args):
 		return
 	fence(doc)
 	selected = list(recipients(doc, method, *args))
+	from arab_streaming.streaming.related import capture_change
+
+	capture_change(doc, method, {(peer.doctype, peer.name) for peer, _state, _config in selected}, *args)
 	if not selected:
 		return
 	operation = {
@@ -170,18 +173,72 @@ def capture(doc, method=None, *args):
 				config["expected_remote_base"] = tracked.remote_digest
 	if previous and operation in ("Update", "Cancel"):
 		before = snapshot(previous)
+		if operation == "Update" and digest(before) == digest(data["document"]):
+			return
 		data["base_digest"] = digest(before)
 		data["changes"] = {k: v for k, v in data["document"].items() if before.get(k) != v}
 		data["removed_fields"] = [k for k in before if k not in data["document"]]
 	return store_event(doc, operation, selected, data=data, method=method)
 
 
-def store_event(doc, operation, selected, data=None, copy_run=None, preserve_existing=False, method=None):
+def store_event(
+	doc,
+	operation,
+	selected,
+	data=None,
+	copy_run=None,
+	preserve_existing=False,
+	method=None,
+	_related_prepared=False,
+	_frozen_versions=None,
+):
 	"""Persist one explicit snapshot using the same immutable outbox as normal saves."""
 	data = data if data is not None else {"document": snapshot(doc)}
 	from arab_streaming.streaming.dependencies import freeze, persist
 
-	versions = freeze(data["document"]) if frappe.db.exists("DocType", "Streaming Document Version") else []
+	# Related associations are projected per peer, before freezing any payload.
+	if not _related_prepared and not data.get("related_only") and operation in ("Create", "Update"):
+		import copy
+
+		from arab_streaming.streaming.related import bundle
+
+		groups = {}
+		for destination in selected:
+			peer_data = copy.deepcopy(data)
+			peer_data.update(bundle(destination[0], data["document"]))
+			versions = (
+				freeze(peer_data["document"], peer_data.get("related_records"), destination[0])
+				if frappe.db.exists("DocType", "Streaming Document Version")
+				else []
+			)
+			key = digest({"data": peer_data, "versions": [list(version) for version in versions]})
+			group = groups.setdefault(key, {"data": peer_data, "versions": versions, "selected": []})
+			group["selected"].append(destination)
+		event = None
+		for group in groups.values():
+			event = store_event(
+				doc,
+				operation,
+				group["selected"],
+				group["data"],
+				copy_run,
+				preserve_existing,
+				method,
+				_related_prepared=True,
+				_frozen_versions=group["versions"],
+			)
+		return event
+
+	related = data.get("related_records") or []
+	if data.get("related_change"):
+		related = [data["related_change"]["document"]]
+	versions = _frozen_versions
+	if versions is None:
+		versions = (
+			freeze(data["document"], related, selected[0][0])
+			if frappe.db.exists("DocType", "Streaming Document Version")
+			else []
+		)
 	from arab_streaming.streaming.files import freeze as freeze_files
 
 	files = freeze_files(data["document"])

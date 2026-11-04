@@ -107,6 +107,8 @@ def remember(peer, source, target, event=None):
 				)
 			)
 		tracked.remote_digest = digest(source)
-		tracked.local_digest = digest(snapshot(target))
+		# Controllers/database defaults can normalize empty values during save.
+		# Check the persisted state that the next event will actually read.
+		tracked.local_digest = digest(snapshot(frappe.get_doc(target.doctype, target.name)))
 		tracked.last_event = event
 		tracked.save(ignore_permissions=True)

@@ -11,12 +11,21 @@ from arab_streaming.streaming.guards import system_write
 from arab_streaming.streaming.policy import authorize_document
 
 
-def freeze(document):
+def freeze(document, related=None, peer=None):
+	overrides = {(doc["doctype"], doc["name"]): doc for doc in related or []}
 	pending = [(document, 0)]
 	seen = {(document["doctype"], document["name"])}
 	versions = []
 	size = 0
 	start = time.monotonic()
+	for (dt, name), data in overrides.items():
+		seen.add((dt, name))
+		encoded = json.dumps(data, ensure_ascii=False)
+		size += len(encoded.encode())
+		versions.append((dt, name, digest(data), encoded))
+		pending.append((data, 1))
+	if len(seen) > 200 or size > 16 * 1024 * 1024:
+		frappe.throw("Dependency snapshot budget exceeded")
 	while pending:
 		current, depth = pending.pop()
 		if depth > 10:
@@ -32,6 +41,10 @@ def freeze(document):
 				continue
 			doc = frappe.get_doc(dt, name)
 			data = snapshot(doc)
+			if peer and dt in ("Contact", "Address"):
+				from arab_streaming.streaming.related import contexts, project
+
+				data = project(data, contexts(peer, [data], document))
 			encoded = json.dumps(data, ensure_ascii=False)
 			size += len(encoded.encode())
 			if size > 16 * 1024 * 1024:

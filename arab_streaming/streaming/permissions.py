@@ -8,6 +8,9 @@ from arab_streaming.streaming.adapters import SAFE_TYPES
 def permission_types(rules):
 	roots = {r["doctype_name"] for r in rules if r.get("enabled")}
 	result = set(roots)
+	# Dynamic Link reverse ownership does not appear as an ordinary Link field.
+	if roots - {"User"}:
+		result.update({"Contact", "Address"})
 	pending = [(dt, 0) for dt in roots]
 	visited = set()
 	while pending:
@@ -48,8 +51,8 @@ def provision(user, rules):
 				read=1,
 				create=1,
 				# User roles are level 1; retain them on create without granting level-0 edits.
-				write=int(dt in roots or (dt == "User" and level > 0)),
-				delete=int(dt in roots),
+				write=int(dt in roots or dt in ("Contact", "Address") or (dt == "User" and level > 0)),
+				delete=int(dt in roots or dt in ("Contact", "Address")),
 				submit=int(bool(meta.is_submittable)),
 				cancel=int(bool(meta.is_submittable)),
 				amend=int(bool(meta.is_submittable)),

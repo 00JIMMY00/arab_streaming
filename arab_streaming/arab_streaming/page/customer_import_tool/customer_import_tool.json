@@ -1,0 +1,10 @@
+{
+ "doctype": "Page",
+ "name": "customer-import-tool",
+ "page_name": "customer-import-tool",
+ "title": "Customer Import Tool",
+ "module": "Arab Streaming",
+ "standard": "Yes",
+ "system_page": 0,
+ "roles": [{"role": "System Manager"}]
+}

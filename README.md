@@ -1,3 +1,11 @@
+## Linked contacts and addresses
+
+Customer synchronization includes linked Contacts and Addresses, including non-primary records. New records and later edits, unlinking, deletion and ordinary renaming follow the Customer rule automatically. Shared associations are projected for each peer, unrelated receiver links are preserved, and conflicting local edits require review. Normal permissions, validation and rule direction/branch restrictions still apply. Linked-only updates avoid saving an unchanged Customer; ERPNext may legitimately update a stored primary-address display when the address itself changes.
+
+## Customer Import Tool
+
+Master System Managers can open `/app/customer-import-tool` or choose Bulk Import Customers in the Customer list. Download the original 18-column Excel template, fill one customer per row, upload privately, validate, and import. Customer Name and Customer Type are required. Supports three phone contacts and two optional addresses; each supplied address needs street, city and country. Existing customer names are skipped. There is no fixed row-count limit. Validation/import run in the long background queue with a two-hour timeout; file-size protections remain 5 MB compressed / 25 MB expanded. Failed imports roll back the whole batch. Keep the page open while processing.
+
 # Arab-ERP Streaming
 
 ## User synchronization — 2026-10-29

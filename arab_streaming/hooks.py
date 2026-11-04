@@ -6,6 +6,8 @@ app_email = "jimmygamaljimmy@gmail.com"
 app_license = "mit"
 required_apps = ["erpnext"]
 
+doctype_list_js = {"Customer": "public/js/customer_list.js"}
+
 after_install = "arab_streaming.install.after_install"
 after_migrate = "arab_streaming.install.after_migrate"
 

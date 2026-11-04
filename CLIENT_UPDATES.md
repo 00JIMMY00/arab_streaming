@@ -1,3 +1,15 @@
+## 2026-10-30 — Contacts and addresses now follow customer changes
+
+Deployed the linked-record fix to both sites and repaired the existing missed associations. Contacts/addresses added after the customer, subsequent edits, removed links and normal deletion/renaming now enter the synchronization workflow automatically, including multiple non-primary contacts. Fixed the circular dependency failure and false conflict checkpoints. Shared links and independent local edits retain their safeguards. All 88 automated tests passed, and a temporary live customer completed automatic add/edit/delete verification and cleanup.
+
+## 2026-10-29 — Import button and simpler upload flow
+
+Fixed the client busy state that kept Import Customers disabled after successful validation: use native async/await with try/finally around Frappe's jQuery-style request promises. Removed the separate Validate action and confirmation dialog; uploads validate automatically and Import directly starts the reviewed job. Default changes trigger automatic revalidation. Moved detailed field guidance into an expandable section. A client regression harness verifies ready-state enablement, actual click dispatch, success display and control recovery with Frappe-style thenables. Node syntax check passed. Backend validation, atomicity, duplicate protection and background bulk processing are unchanged.
+
+## 2026-10-29 — Bulk customer import
+
+Added the master Customer Import Tool with original Excel template download, private upload, validation, three phone contacts and two addresses. Removed the initial 500-row restriction at the user's request. Validation and import now run in background jobs. Eight isolated tests pass, including creation of 501 customers in one import.
+
 # Arab-ERP Streaming updates
 
 ## User synchronization — 2026-10-29
