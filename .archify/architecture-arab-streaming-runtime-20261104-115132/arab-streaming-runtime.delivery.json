@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e908d337-6f1a-44df-bb1e-46d62849d602",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/candidate.json",
+  "output": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.html",
+  "specification": {
+    "sha256": "40787d76a0b114d86d42b2aadb39d7fa1976d1b629c1a536a726e72f0121a974",
+    "bytes": 13472
+  },
+  "artifact": {
+    "sha256": "ece633c05e73e2ae66edf5ba5cfd1afd43122378b8e7475daa9404de82396ba0",
+    "bytes": 861490
+  }
+}

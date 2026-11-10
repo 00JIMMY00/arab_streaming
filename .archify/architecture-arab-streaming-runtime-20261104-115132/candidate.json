@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arab-ERP Streaming runtime",
+    "locale": "en",
+    "output": ".archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/00JIMMY00/arab_streaming.git",
+      "revision": "9d575584038ede8fcbd0b398f729bdfb41b2a610",
+      "link_mode": "web"
+    }
+  },
+  "components": [
+    {
+      "id": "operator",
+      "type": "backend",
+      "label": "Source ERPNext record",
+      "sublabel": "Create / update / lifecycle",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/hooks.py",
+          "line": 16,
+          "end_line": 29
+        },
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 132,
+          "end_line": 181
+        }
+      ]
+    },
+    {
+      "id": "capture",
+      "type": "backend",
+      "label": "Rule-based capture",
+      "sublabel": "Role / direction / Branch",
+      "pos": [
+        330,
+        40
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 15,
+          "end_line": 37
+        },
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 67,
+          "end_line": 92
+        },
+        {
+          "path": "arab_streaming/streaming/policy.py",
+          "line": 104,
+          "end_line": 127
+        }
+      ]
+    },
+    {
+      "id": "outbox",
+      "type": "messagebus",
+      "label": "Durable outbox",
+      "sublabel": "Dispatch Event + versions",
+      "pos": [
+        620,
+        40
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 195,
+          "end_line": 228
+        },
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 244,
+          "end_line": 287
+        }
+      ]
+    },
+    {
+      "id": "delivery",
+      "type": "backend",
+      "label": "Peer delivery",
+      "sublabel": "Supervised Python agent",
+      "pos": [
+        910,
+        40
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/agent.py",
+          "line": 16,
+          "end_line": 40
+        },
+        {
+          "path": "arab_streaming/streaming/delivery.py",
+          "line": 77,
+          "end_line": 105
+        },
+        {
+          "path": "arab_streaming/streaming/transport.py",
+          "line": 43,
+          "end_line": 67
+        }
+      ]
+    },
+    {
+      "id": "wire",
+      "type": "security",
+      "label": "Receiving wire API",
+      "sublabel": "Pair-bound credentials",
+      "pos": [
+        910,
+        360
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/api/events.py",
+          "line": 9,
+          "end_line": 38
+        },
+        {
+          "path": "arab_streaming/auth.py",
+          "line": 51,
+          "end_line": 104
+        },
+        {
+          "path": "arab_streaming/streaming/client.py",
+          "line": 15,
+          "end_line": 45
+        }
+      ]
+    },
+    {
+      "id": "inbox",
+      "type": "messagebus",
+      "label": "Durable inbox",
+      "sublabel": "Capture Event + receipt",
+      "pos": [
+        620,
+        360
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/inbox.py",
+          "line": 15,
+          "end_line": 70
+        },
+        {
+          "path": "arab_streaming/streaming/inbox.py",
+          "line": 94,
+          "end_line": 140
+        }
+      ]
+    },
+    {
+      "id": "replay",
+      "type": "backend",
+      "label": "Replay executor",
+      "sublabel": "Local user / conflict checks",
+      "pos": [
+        330,
+        560
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/context.py",
+          "line": 13,
+          "end_line": 24
+        },
+        {
+          "path": "arab_streaming/streaming/executor.py",
+          "line": 225,
+          "end_line": 265
+        },
+        {
+          "path": "arab_streaming/streaming/executor.py",
+          "line": 424,
+          "end_line": 448
+        }
+      ]
+    },
+    {
+      "id": "target",
+      "type": "backend",
+      "label": "Target ERPNext",
+      "sublabel": "Normal business controllers",
+      "pos": [
+        40,
+        560
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/executor.py",
+          "line": 198,
+          "end_line": 210
+        }
+      ]
+    },
+    {
+      "id": "source-store",
+      "type": "database",
+      "label": "Source MariaDB",
+      "sublabel": "Independent site database",
+      "pos": [
+        620,
+        180
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 245,
+          "end_line": 284
+        },
+        {
+          "path": "arab_streaming/streaming/outbox.py",
+          "line": 40,
+          "end_line": 65
+        }
+      ]
+    },
+    {
+      "id": "receiver-store",
+      "type": "database",
+      "label": "Receiver MariaDB",
+      "sublabel": "Independent site database",
+      "pos": [
+        620,
+        560
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/inbox.py",
+          "line": 94,
+          "end_line": 130
+        },
+        {
+          "path": "arab_streaming/streaming/executor.py",
+          "line": 424,
+          "end_line": 448
+        }
+      ]
+    },
+    {
+      "id": "receiver-runner",
+      "type": "backend",
+      "label": "Receiver peer runner",
+      "sublabel": "Lock / policy / apply / results",
+      "pos": [
+        330,
+        360
+      ],
+      "size": [
+        180,
+        72
+      ],
+      "sources": [
+        {
+          "path": "arab_streaming/streaming/delivery.py",
+          "line": 77,
+          "end_line": 108
+        },
+        {
+          "path": "arab_streaming/streaming/delivery.py",
+          "line": 127,
+          "end_line": 146
+        },
+        {
+          "path": "arab_streaming/tasks.py",
+          "line": 35,
+          "end_line": 53
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "Master site trust domain",
+      "wraps": [
+        "operator",
+        "capture",
+        "outbox",
+        "delivery",
+        "source-store"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "security-group",
+      "label": "Branch site trust domain",
+      "wraps": [
+        "wire",
+        "inbox",
+        "replay",
+        "target",
+        "receiver-store",
+        "receiver-runner"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "security-group",
+      "label": "Local business identity",
+      "wraps": [
+        "replay",
+        "target"
+      ],
+      "pad": 12
+    }
+  ],
+  "connections": [
+    {
+      "id": "operator-to-capture",
+      "to": "capture",
+      "label": "Doc hooks",
+      "variant": "emphasis",
+      "from": "operator"
+    },
+    {
+      "id": "capture-to-outbox",
+      "to": "outbox",
+      "label": "Matched save",
+      "variant": "emphasis",
+      "from": "capture"
+    },
+    {
+      "id": "outbox-to-delivery",
+      "to": "delivery",
+      "label": "Read pending",
+      "variant": "emphasis",
+      "from": "outbox"
+    },
+    {
+      "id": "delivery-to-wire",
+      "to": "wire",
+      "label": "HTTPS + peer auth",
+      "variant": "emphasis",
+      "from": "delivery"
+    },
+    {
+      "id": "wire-to-inbox",
+      "to": "inbox",
+      "label": "Rule / Branch",
+      "variant": "emphasis",
+      "from": "wire"
+    },
+    {
+      "id": "inbox-to-runner",
+      "to": "receiver-runner",
+      "label": "Pending rows",
+      "variant": "emphasis",
+      "from": "inbox"
+    },
+    {
+      "id": "runner-to-replay",
+      "from": "receiver-runner",
+      "to": "replay",
+      "label": "Execute due",
+      "variant": "emphasis"
+    },
+    {
+      "id": "replay-to-target",
+      "to": "target",
+      "label": "Permissions",
+      "variant": "emphasis",
+      "from": "replay"
+    },
+    {
+      "id": "outbox-store",
+      "from": "outbox",
+      "to": "source-store",
+      "label": "Persist"
+    },
+    {
+      "id": "inbox-store",
+      "from": "inbox",
+      "to": "receiver-store",
+      "label": "Persist"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Primary path and call ownership",
+      "items": [
+        "Highlighted arrows follow one selected master \u2192 branch business event. Both sites run the same app; this is a runtime overview, not a synchronous call stack.",
+        "api/events.py:18\u201338 calls ingest() and returns receipts. delivery.py:103\u2013108 later calls execute_captures() and refresh_results(). The API does not execute business application.",
+        "The receiver runner reads inbox rows; logical outbox/inbox DocTypes live in the per-site databases."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "What actually triggers a dispatch",
+      "items": [
+        "hooks.py:17\u201329 registers document lifecycle callbacks. outbox.py:15\u201324 requires enabled streaming, Master/Slave role, eligible DocType and no trusted replay or install/migration context.",
+        "outbox.py:67\u201392 selects event flags, rule direction, Branch and conditions from committed configuration. policy.py:104\u2013127 handles Both and separate reverse conditions. Missing required Branch is rejected.",
+        "outbox.py:135\u2013136 suppresses duplicate insert/submit callbacks; 174\u2013180 suppresses unchanged snapshots. on_submit maps to an Update carrying document state."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Transaction and immutable payload",
+      "items": [
+        "outbox.py:195\u2013228 projects linked associations per peer and groups matching payloads. 244\u2013287 freezes files/dependencies, inserts Dispatch Event and registers an after-commit wakeup without committing the business transaction.",
+        "Source changes and their dispatch roll back together. transport.py:43\u201367 selects due, unacknowledged destination rows in event sequence and verifies pairing generation.",
+        "MariaDB holds business, event, receipt, immutable-version and checkpoint state independently for each site."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Peer and execution trust boundaries",
+      "items": [
+        "delivery.py:77\u201382 requires an enabled Connected peer and synchronized policy before transport. client.py:15\u201345 uses HTTPS-only normalized URLs, dedicated credentials, bounded requests and no redirects.",
+        "auth.py:51\u2013104 restricts credentials to wire endpoints. inbox.py:15\u201370 validates envelope, source/pairing/generation, captured rule, Branch and duplicate digest.",
+        "context.py:13\u201324 switches replay to an enabled non-Administrator local user. executor.py:38\u201380 enforces duplicate policy, permissions, mappings and conflict base; 198\u2013210 uses normal save/insert/submit/cancel. Frames show logical trust domains, not inferred network firewalls."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Execution ordering and delivery results",
+      "items": [
+        "executor.py:352\u2013363 pauses normal slave replay during an In Progress/Failed bootstrap. 397\u2013424 coalesces rename identities, chooses the earliest pending event per record and then the earliest due head; it is not one global FIFO blocking every record.",
+        "executor.py:424\u2013452 commits successful application and capture status together; failures roll back business effects and persist backoff. Independent records can continue.",
+        "transport.py:71\u2013102 marks durable delivery. feedback.py:116\u2013182 separately fetches receiver outcomes. feedback.py:99\u2013113 retries the existing failed capture; Delivered does not mean Applied."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Supporting dependencies and alternate paths",
+      "items": [
+        "agent.py:16\u201340 runs supervised per-peer passes, default interval one second. delivery.py:127\u2013146 uses a Redis peer lock. tasks.py:4\u201345 queues recovery jobs; hooks.py:30\u201333 schedules minute recovery and daily retention. These are configured intervals, not measured latency.",
+        "Frappe/ERPNext supply HTTP routing, controllers, permissions and document storage; Redis and Frappe workers support scheduling. Per-site Redis services are described here to keep the canvas focused.",
+        "delivery.py:85\u201387 advances Copy Runs before exchange. transport.py:105\u2013140 lets branch agents push outgoing events and pull incoming master events, committing local receipt before remote acknowledgement. The highlighted route shows direct master push.",
+        "This diagram is derived from the cited code at the pinned revision. No live deployment, latency or business acceptance test was performed."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/candidate.json",
+    "sha256": "54bd3e1c5d8aa9a496a17b57d0e3eccef551169e588ff9bd7d7037d1abd61d2c",
+    "bytes": 10519
+  },
+  "artifact": {
+    "path": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.html",
+    "sha256": "e1819f0b70fe0c875dfe279069a754d38bf32e5bd1de24ea8d92748ac329a5f3",
+    "bytes": 856672
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.finalize.json",
+    "summaryReceipt": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.finalize-summary.json",
+    "browserCheckReceipt": "/home/xxx/bench1/my-bench/apps/arab_streaming/.archify/architecture-arab-streaming-runtime-20261104-115132/arab-streaming-runtime.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-04T09:51:32.395Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3966,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}
