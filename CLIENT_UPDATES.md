@@ -1,3 +1,12 @@
+## 2026-11-15 — Packaged app images during synchronization
+
+Version 0.2.3 accepts `/assets/<installed-app>/...` images after validating that
+the path stays inside the app's public directory and the file exists. The receiver
+checks its own installed copy and retains the URL; no File upload record or
+network download is needed for images shipped in the app release. Uploaded-file
+hash transfer and verified HTTPS references keep their existing behavior.
+Traversal, unknown apps, missing files and symlinks outside public stay rejected.
+
 ## 2026-11-15 — Administrator-owned Instance Keys
 
 Instance Keys may now be owned by Administrator. A dedicated enabled identity is

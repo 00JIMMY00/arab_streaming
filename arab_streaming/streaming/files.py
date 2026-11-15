@@ -7,7 +7,7 @@ import os
 import re
 import tempfile
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 import frappe
 
@@ -34,12 +34,40 @@ def version_path(checksum):
 	return Path(frappe.get_site_path("private", "files", ".arab_streaming_versions", checksum))
 
 
+def packaged_asset(url):
+	"""Validate an installed app's public asset, without reading or downloading it."""
+	if not isinstance(url, str) or not url.startswith("/assets/"):
+		return False
+	parsed = urlsplit(url)
+	path = unquote(parsed.path)
+	parts = path.split("/")
+	if (
+		parsed.scheme
+		or parsed.netloc
+		or len(parts) < 4
+		or any(part in (".", "..", "") for part in parts[1:])
+		or any(ord(c) < 32 for c in path)
+		or "\\" in path
+	):
+		frappe.throw("Invalid packaged asset URL")
+	app = parts[2]
+	if not re.fullmatch(r"[a-z][a-z0-9_]*", app) or app not in frappe.get_installed_apps():
+		frappe.throw("Install the app that provides this asset before synchronizing")
+	root = Path(frappe.get_app_path(app, "public")).resolve()
+	asset = root.joinpath(*parts[3:]).resolve()
+	if not asset.is_relative_to(root) or not asset.is_file():
+		frappe.throw("Packaged asset is missing from the installed app: " + frappe.utils.escape_html(url))
+	return True
+
+
 def freeze(document):
 	result = []
 	total = 0
 	for _doc, _field, url in references(document):
 		if not isinstance(url, str):
 			frappe.throw("Invalid attachment URL")
+		if packaged_asset(url):
+			continue
 		if url.startswith("https://"):
 			parsed = urlsplit(url)
 			if parsed.username or parsed.password:
@@ -126,6 +154,10 @@ def manifest_for(peer, doctype, name, root_event=None, export=None):
 
 
 def import_files(peer, document, export=None):
+	# These are shipped with the matching app release, not uploaded File records.
+	# Verify the receiving app also has the asset before preserving its URL.
+	for _owner, _field, url in references(document):
+		packaged_asset(url)
 	refs = [r for r in references(document) if r[2].startswith(("/files/", "/private/files/"))]
 	if not refs:
 		return
