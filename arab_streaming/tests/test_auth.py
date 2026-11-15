@@ -45,6 +45,39 @@ class TestStreamingAuth(FrappeTestCase):
 		with self.assertRaises(frappe.AuthenticationError):
 			require_wire_auth()
 
+	def test_administrator_owned_key_saves_and_authenticates_with_managed_user(self):
+		key = frappe.get_doc(dict(doctype="Instance Key", user="Administrator", enabled=1)).insert()
+		self.assertEqual(key.user, "Administrator")
+		self.assertNotIn(key.execution_user, (None, "Administrator", "Guest"))
+		self.assertTrue(frappe.db.get_value("User", key.execution_user, "enabled"))
+		self.assertNotIn("System Manager", frappe.get_roles(key.execution_user))
+		identity = authenticate_credentials(key.api_key, key.get_password("api_secret"))
+		self.assertEqual(identity.user, key.execution_user)
+		frappe.local.arab_streaming_key = key.name
+		frappe.local.arab_streaming_peer = None
+		wire = require_wire_auth()
+		self.assertEqual(wire.user, key.execution_user)
+		self.assertEqual(wire.api_key, key.api_key)
+
+	def test_disabled_managed_user_rejects_administrator_key(self):
+		key = frappe.get_doc(dict(doctype="Instance Key", user="Administrator", enabled=1)).insert()
+		secret = key.get_password("api_secret")
+		frappe.db.set_value("User", key.execution_user, "enabled", 0)
+		with self.assertRaises(frappe.AuthenticationError):
+			authenticate_credentials(key.api_key, secret)
+		# It must still be possible for the owner to disable the key.
+		key.enabled = 0
+		key.save()
+
+	def test_guest_owner_stays_rejected(self):
+		with self.assertRaises(frappe.ValidationError):
+			frappe.get_doc(dict(doctype="Instance Key", user="Guest", enabled=1)).insert()
+
+	def test_normal_owner_cannot_select_a_different_execution_identity(self):
+		self.key.execution_user = "Administrator"
+		self.key.save()
+		self.assertEqual(self.key.execution_user, self.user.name)
+
 	def test_instance_credentials_cannot_authenticate_generic_document_api(self):
 		header = f"ArabStreaming {self.key.api_key}:{self.secret}"
 		with patch(

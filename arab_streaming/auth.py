@@ -41,11 +41,20 @@ def authenticate_credentials(key, secret):
 	if (
 		not stored
 		or not hmac.compare_digest(stored, secret)
-		or row.user in ("Guest", "Administrator")
+		or row.user == "Guest"
 		or not frappe.db.get_value("User", row.user, "enabled")
 	):
 		raise frappe.AuthenticationError("Invalid streaming credentials")
+	row.user = key_execution_user(frappe.get_doc("Instance Key", row.name))
 	return row
+
+
+def key_execution_user(key):
+	"""Administrator can own a key; business replay retains its managed identity."""
+	user = key.get("execution_user") if key.user == "Administrator" else key.user
+	if not user or user in ("Administrator", "Guest") or not frappe.db.get_value("User", user, "enabled"):
+		raise frappe.AuthenticationError("The Instance Key execution user is unavailable")
+	return user
 
 
 def authenticate_request():
@@ -101,4 +110,5 @@ def require_wire_auth():
 		return frappe._dict(
 			api_key=state.incoming_access_key, user=state.execution_user, peer_state=state.name
 		)
-	return frappe.get_doc("Instance Key", key)
+	doc = frappe.get_doc("Instance Key", key)
+	return frappe._dict(name=doc.name, api_key=doc.api_key, user=key_execution_user(doc))

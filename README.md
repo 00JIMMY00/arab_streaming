@@ -1,3 +1,11 @@
+## 2026-11-15 — Administrator-owned Instance Keys
+
+Instance Keys may now be owned by Administrator. A dedicated enabled identity is
+created automatically for each such key, with the existing rule-scoped execution
+permissions. Wire authentication and pairing use that identity; credentials remain
+limited to the explicit streaming wire methods. Guest owners and disabled users
+remain rejected. Existing non-Administrator keys retain their owner identity.
+
 ## RMS release-group installation — 2026-11-15
 
 For the RMS product, include the applications in one release group in this order: **Frappe → ERPNext → Arab Streaming → RMS**. Arab Streaming already requires ERPNext; RMS now declares Arab Streaming as a required application. The current RMS site uses Frappe/ERPNext 15.122.0 and Arab Streaming 0.2.0. Its native site installation and workspace were verified; existing other apps were retained.

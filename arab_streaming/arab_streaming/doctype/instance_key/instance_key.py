@@ -24,18 +24,43 @@ class InstanceKey(Document):
 		self.api_secret = generate_token()
 
 	def validate(self):
-		if (self.enabled and not frappe.db.get_value("User", self.user, "enabled")) or self.user in (
-			"Administrator",
-			"Guest",
-		):
-			frappe.throw(
-				"Instance Key requires an enabled integration User other than Administrator or Guest"
-			)
+		if self.user == "Guest" or (self.enabled and not frappe.db.get_value("User", self.user, "enabled")):
+			frappe.throw("Instance Key requires an enabled User other than Guest")
 		previous = self.get_doc_before_save()
 		if previous and (self.api_key != previous.api_key or self.api_secret != previous.api_secret):
 			frappe.throw("Instance Key credentials are immutable; create a replacement key")
 		if previous and self.user != previous.user:
 			require_administrator()
+		if self.user == "Administrator":
+			require_administrator()
+			self.execution_user = self._administrator_execution_user()
+		else:
+			self.execution_user = self.user
+
+	def _administrator_execution_user(self):
+		import hashlib
+
+		from arab_streaming.streaming.permissions import provision
+		from arab_streaming.streaming.policy import stored_rules
+
+		if not self.api_key:
+			frappe.throw("Save a new Instance Key to generate its credentials first")
+		identity = hashlib.sha256(self.api_key.encode()).hexdigest()[:20]
+		user = f"streaming-key-{identity}@arab-erp.invalid"
+		if not frappe.db.exists("User", user):
+			frappe.get_doc(
+				dict(
+					doctype="User",
+					email=user,
+					first_name="Streaming Integration",
+					enabled=1,
+					user_type="System User",
+					send_welcome_email=0,
+				)
+			).insert(ignore_permissions=True)
+		if self.enabled:
+			provision(user, [dict(r) for r in stored_rules() if r.enabled])
+		return user
 
 	@frappe.whitelist()
 	def reveal_secret(self):
