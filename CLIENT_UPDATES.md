@@ -1,3 +1,12 @@
+## 2026-11-15 — Preserve built-in identity references locally
+
+Version 0.2.6 retains Links to Administrator and Guest without freezing their
+protected User records as dependencies. Every Frappe site already has these
+identities; ordinary users still follow the configured dependency behavior.
+This avoids demanding access to the protected Administrator record during a
+business snapshot. Source business permissions and native target validation stay
+in effect.
+
 ## 2026-11-15 — Batch internal export snapshot artifacts
 
 Version 0.2.5 writes the internal Streaming Snapshot Item artifacts in small

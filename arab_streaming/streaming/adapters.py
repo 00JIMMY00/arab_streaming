@@ -201,6 +201,10 @@ def linked_records(document, path=None):
 			doctype = field.options if field.fieldtype == "Link" else document.get(field.options)
 			if not isinstance(doctype, str) or not isinstance(value, str):
 				frappe.throw("Invalid catalog link")
+			# Built-in identities already exist on every site. Keep their Link
+			# values, but never freeze or replicate their protected User records.
+			if doctype == "User" and value in ("Administrator", "Guest"):
+				continue
 			yield doctype, value, location
 
 

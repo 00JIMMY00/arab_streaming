@@ -91,3 +91,41 @@ class TestBootstrapSelection(unittest.TestCase):
 				],
 				[],
 			)
+
+	def test_builtin_user_links_stay_local_including_nested_links(self):
+		from arab_streaming.streaming.adapters import linked_records
+
+		parent = frappe._dict(
+			fields=[
+				frappe._dict(fieldname="operator", fieldtype="Link", options="User"),
+				frappe._dict(fieldname="rows", fieldtype="Table", options="Child"),
+			]
+		)
+		child = frappe._dict(
+			fields=[
+				frappe._dict(fieldname="target_type", fieldtype="Data"),
+				frappe._dict(fieldname="target", fieldtype="Dynamic Link", options="target_type"),
+			]
+		)
+		document = dict(
+			doctype="Parent",
+			operator="Administrator",
+			rows=[
+				dict(doctype="Child", target_type="User", target="Guest"),
+				dict(doctype="Child", target_type="User", target="cashier@example.invalid"),
+			],
+		)
+		with (
+			patch("frappe.get_meta", side_effect=lambda dt: parent if dt == "Parent" else child),
+			patch(
+				"arab_streaming.streaming.adapters.transferable_fields", side_effect=lambda meta: meta.fields
+			),
+		):
+			self.assertEqual(
+				list(linked_records(document)),
+				[
+					("User", "cashier@example.invalid", "Parent.rows[2].target"),
+				],
+			)
+		self.assertEqual(document["operator"], "Administrator")
+		self.assertEqual(document["rows"][0]["target"], "Guest")
