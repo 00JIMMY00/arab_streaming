@@ -5,18 +5,18 @@ import hashlib
 import frappe
 
 from arab_streaming.streaming.context import replay_source
-from arab_streaming.streaming.policy import check_source, document_branches, stored_rules
+from arab_streaming.streaming.policy import check_source, direction_allowed, document_branches, stored_rules
 
 
 def before_naming(doc, method=None):
 	if (
 		replay_source()
 		or not frappe.conf.get("arab_streaming_enabled")
-		or not doc.meta.is_submittable
+		or not (doc.meta.is_submittable or doc.meta.autoname == "naming_series:")
 		or not doc.meta.has_field("naming_series")
 	):
 		return
-	rules = [r for r in stored_rules() if r.enabled and r.doctype_name == doc.doctype]
+	rules = [r for r in stored_rules() if r.enabled and r.doctype_name == doc.doctype and direction_allowed(r.direction)]
 	if not rules:
 		return
 	check_source(doc)

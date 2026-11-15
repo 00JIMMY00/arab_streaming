@@ -4,14 +4,22 @@ import frappe
 
 from arab_streaming.streaming.adapters import SAFE_TYPES
 
+# Price List's native controller fills missing default lists in these singletons.
+# Grant only these documented side effects when Price List itself is configured.
+CONTROLLER_WRITES = {"Price List": {"Buying Settings", "Selling Settings"}}
+
+
+def controller_writes(roots):
+	return set().union(*(CONTROLLER_WRITES.get(dt, set()) for dt in roots))
+
 
 def permission_types(rules):
 	roots = {r["doctype_name"] for r in rules if r.get("enabled")}
-	result = set(roots)
+	result = roots | controller_writes(roots)
 	# Dynamic Link reverse ownership does not appear as an ordinary Link field.
 	if roots - {"User"}:
 		result.update({"Contact", "Address"})
-	pending = [(dt, 0) for dt in roots]
+	pending = [(dt, 0) for dt in result]
 	visited = set()
 	while pending:
 		dt, depth = pending.pop()
@@ -34,6 +42,7 @@ def provision(user, rules):
 	from frappe.permissions import setup_custom_perms
 
 	roots, types = permission_types(rules)
+	controller_types = controller_writes(roots)
 	import hashlib
 
 	role = "Arab Streaming " + hashlib.sha256(user.encode()).hexdigest()[:12]
@@ -51,7 +60,7 @@ def provision(user, rules):
 				read=1,
 				create=1,
 				# User roles are level 1; retain them on create without granting level-0 edits.
-				write=int(dt in roots or dt in ("Contact", "Address") or (dt == "User" and level > 0)),
+				write=int(dt in roots or dt in controller_types or dt in ("Contact", "Address") or (dt == "User" and level > 0)),
 				delete=int(dt in roots or dt in ("Contact", "Address")),
 				submit=int(bool(meta.is_submittable)),
 				cancel=int(bool(meta.is_submittable)),

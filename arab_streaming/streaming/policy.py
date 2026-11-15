@@ -168,6 +168,30 @@ def discover_branch_field(doctype):
 	return next((f.fieldname for f in meta.fields if f.fieldtype == "Link" and f.options == "Branch"), None)
 
 
+def validate_branch_path(doctype, path):
+	"""Validate a declared resolver without creating fields on business records."""
+	if path.startswith("app:"):
+		resolver = frappe.get_hooks("arab_streaming_branch_resolvers", {}).get(path[4:])
+		if isinstance(resolver, list):
+			resolver = resolver[-1] if resolver else None
+		if not resolver or not callable(frappe.get_attr(resolver)):
+			frappe.throw("Install the app that provides this Streaming Rule Branch resolver")
+		return
+	if not re.fullmatch(r"[A-Za-z_][\w]*(\.[A-Za-z_][\w]*){0,2}", path):
+		frappe.throw("Choose a valid Branch field for this Streaming Rule")
+	parts = path.split(".")
+	for index, part in enumerate(parts):
+		field = frappe.get_meta(doctype).get_field(part)
+		if not field:
+			frappe.throw("Configured Branch field is absent from this site")
+		if index == len(parts) - 1:
+			if field.fieldtype != "Link" or field.options != "Branch":
+				frappe.throw("Branch resolver must end at a Link to Branch")
+		elif field.fieldtype not in ("Link", "Table", "Table MultiSelect") or not field.options:
+			frappe.throw("Branch field paths must follow document links or child tables")
+		doctype = field.options
+
+
 def _values(document, parts):
 	if not parts:
 		return []
@@ -189,9 +213,17 @@ def _values(document, parts):
 	return []
 
 
-def document_branches(document, config):
+def document_branches(document, config, peer=None, incoming=False):
 	if config.get("scope") == "Shared":
 		return None
+	path = config.get("branch_field") or ""
+	if path.startswith("app:"):
+		resolver = frappe.get_hooks("arab_streaming_branch_resolvers", {}).get(path[4:])
+		if isinstance(resolver, list):
+			resolver = resolver[-1] if resolver else None
+		if not resolver:
+			frappe.throw("Install the app that provides this Streaming Rule Branch resolver")
+		return set(frappe.get_attr(resolver)(document, config, peer=peer, incoming=incoming))
 	if config.get("scope") == "Assigned Branches" and not config.get("branch_field"):
 		name = frappe.db.get_value(
 			"Streaming Branch Assignment",
@@ -216,8 +248,8 @@ def document_branches(document, config):
 	return set(_values(document, path.split(".")))
 
 
-def matches_scope(document, config, branch, required=False):
-	values = document_branches(document, config)
+def matches_scope(document, config, branch, required=False, peer=None, incoming=False):
+	values = document_branches(document, config, peer=peer, incoming=incoming)
 	if values is None:
 		return True
 	if not values:
@@ -232,7 +264,8 @@ def matches_scope(document, config, branch, required=False):
 def check_source(doc):
 	if not frappe.db.exists("DocType", "Streaming Rule"):
 		return
-	rows = [r for r in stored_rules() if r.enabled and r.doctype_name == doc.doctype]
+	rows = [r for r in stored_rules() if r.enabled and r.doctype_name == doc.doctype
+		and (direction_allowed(r.direction) or frappe.conf.get("arab_streaming_site_role") == "Slave")]
 	if not rows:
 		return
 	branch = None
@@ -242,7 +275,7 @@ def check_source(doc):
 		if row.scope == "Shared":
 			continue
 		path = row.branch_field or discover_branch_field(doc.doctype)
-		if branch and path and "." not in path and not doc.get(path):
+		if branch and path and not path.startswith("app:") and "." not in path and not doc.get(path):
 			doc.set(path, branch)
 		values = document_branches(doc, row)
 		if not values:
@@ -275,7 +308,7 @@ def authorize_document(peer, document, incoming=False, config=None, dependency=F
 			frappe.throw(
 				"This DocType/direction is not enabled for the authenticated Branch", frappe.PermissionError
 			)
-	if not matches_scope(document, config, peer.restaurant_branch):
+	if not matches_scope(document, config, peer.restaurant_branch, peer=peer, incoming=incoming):
 		frappe.throw("Document Branch does not match the authenticated peer", frappe.PermissionError)
 
 
@@ -283,7 +316,6 @@ def ensure_dimension():
 	from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 		make_dimension_in_accounting_doctypes,
 	)
-	from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
 	name = frappe.db.get_value("Accounting Dimension", {"document_type": "Branch"})
 	if name:
@@ -360,6 +392,8 @@ def validate_rule(doc):
 		doc.branch_field = doc.branch_field or discover_branch_field(doc.doctype_name)
 		if doc.enabled and not doc.branch_field:
 			frappe.throw("Use Set Up Branch Field before enabling this Branch-scoped rule")
+		if doc.enabled:
+			validate_branch_path(doc.doctype_name, doc.branch_field)
 	if meta.issingle and (doc.scope != "Shared" or doc.direction != "Master to Slave"):
 		frappe.throw("Business singleton settings use Shared scope and Master to Slave direction")
 	if doc.scope == "Shared" and meta.is_submittable:

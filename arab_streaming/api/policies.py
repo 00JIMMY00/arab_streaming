@@ -44,6 +44,12 @@ def install(peer, state, data):
 	errors = []
 	valid_rules = []
 	with system_write():
+		# Superseded local defaults must not overlap the incoming publication.
+		# These changes and all rule validations share the caller's transaction.
+		published_names = {r.get("name") for r in rules if isinstance(r, dict)}
+		frappe.db.sql("SELECT name FROM `tabStreaming Site State` WHERE name='local' FOR UPDATE")
+		for name in existing - published_names:
+			frappe.db.set_value("Streaming Rule", name, "enabled", 0)
 		for row in rules:
 			if not isinstance(row, dict) or not isinstance(row.get("name"), str):
 				frappe.throw("Invalid rule identity")
@@ -59,9 +65,8 @@ def install(peer, state, data):
 				continue
 			valid_rules.append(row)
 			if row.get("scope") == "Branch" and row.get("enabled"):
-				field = ensure_branch_field(row["doctype_name"])
 				if not row.get("branch_field"):
-					row["branch_field"] = field
+					row["branch_field"] = ensure_branch_field(row["doctype_name"])
 			name = row["name"]
 			incoming.add(name)
 			doc = (

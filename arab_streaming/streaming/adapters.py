@@ -56,6 +56,8 @@ BLOCKED_TYPES = frozenset(
 def is_business_doctype(doctype):
 	if not isinstance(doctype, str) or doctype in BLOCKED_TYPES or not frappe.db.exists("DocType", doctype):
 		return False
+	if doctype in frappe.get_hooks("arab_streaming_local_doctypes"):
+		return False
 	meta = frappe.get_meta(doctype)
 	if meta.module == "Arab Streaming" or meta.istable or meta.get("is_virtual"):
 		return False
@@ -131,11 +133,12 @@ def require_supported(doctype):
 
 def transferable_fields(meta):
 	from arab_streaming.protocol.codec import EXCLUDE
+	local_fields = frozenset(frappe.get_hooks("arab_streaming_local_fields", {}).get(meta.name, []))
 
 	return [
 		field
 		for field in meta.fields
-		if field.fieldname not in EXCLUDE | LOCAL_FIELDS.get(meta.name, frozenset())
+		if field.fieldname not in EXCLUDE | LOCAL_FIELDS.get(meta.name, frozenset()) | local_fields
 		and field.fieldtype not in (*display_fieldtypes, "Password")
 		and not field.get("is_virtual")
 	]

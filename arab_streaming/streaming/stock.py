@@ -44,7 +44,7 @@ def selected_vouchers(peer, types):
 			continue
 		predicate = filters(parse(rule.conditions, condition_fields(rule.doctype_name)))
 		path = rule.branch_field or discover_branch_field(rule.doctype_name)
-		if path and "." not in path:
+		if path and "." not in path and not path.startswith("app:"):
 			predicate.append([path, "=", peer.restaurant_branch])
 		names = frappe.get_list(rule.doctype_name, filters=predicate, pluck="name", limit_page_length=5001)
 		if len(names) > 5000:
@@ -58,20 +58,35 @@ def selected_vouchers(peer, types):
 
 
 def movements(peer, types, vouchers):
+	from arab_streaming.streaming.policy import config_for, matches_scope
+
 	branch_field = discover_branch_field("Stock Ledger Entry")
-	if not branch_field:
-		frappe.throw("Branch Inventory Dimension is missing from Stock Ledger Entry")
 	rows = []
 	for kind in types:
 		names = vouchers.get(kind) or []
 		if not names:
 			continue
+		config = config_for(peer, kind) or config_for(peer, kind, incoming=True)
+		path = (config.get("branch_field") or "") if config else ""
+		linked_scope = bool(config and config.scope == "Branch" and ("." in path or path.startswith("app:")))
+		if linked_scope:
+			# App-managed routing owns the voucher, not a copied ledger dimension.
+			# Never accept arbitrary voucher names from a stock snapshot.
+			for name in names:
+				doc = frappe.get_doc(kind, name)
+				doc.check_permission("read")
+				if not matches_scope(doc, config, peer.restaurant_branch):
+					frappe.throw("Stock voucher belongs to another Branch", frappe.PermissionError)
+		elif not branch_field:
+			frappe.throw("Branch Inventory Dimension is missing from Stock Ledger Entry")
+		branch_clause = "" if linked_scope else f"`{branch_field}`=%s AND "
+		parameters = (kind, tuple(names)) if linked_scope else (peer.restaurant_branch, kind, tuple(names))
 		rows.extend(
 			frappe.db.sql(
 				f"""SELECT item_code,warehouse,SUM(actual_qty) quantity,SUM(stock_value_difference) value
-            FROM `tabStock Ledger Entry` WHERE `{branch_field}`=%s AND voucher_type=%s AND voucher_no IN %s
+            FROM `tabStock Ledger Entry` WHERE {branch_clause}voucher_type=%s AND voucher_no IN %s
             GROUP BY item_code,warehouse""",
-				(peer.restaurant_branch, kind, tuple(names)),
+				parameters,
 				as_dict=True,
 			)
 		)

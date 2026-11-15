@@ -332,14 +332,17 @@ def run_initial(name, run_name, token):
 	except ObsoleteRun:
 		frappe.db.rollback()
 	except Exception as exc:
+		traceback = frappe.get_traceback(with_context=False)
 		frappe.db.rollback()
 		try:
 			doc, run = locked_run(name, run_name, token)
+			frappe.log_error(title="Streaming initial copy failed", message=traceback,
+				reference_doctype="Master Instance", reference_name=name)
 			with system_write():
 				run.status = "Failed"
 				run.save(ignore_permissions=True)
 				doc.syncing_status = "Failed"
-				doc.exceptions = str(exc)[:4000]
+				doc.exceptions = (str(exc) or type(exc).__name__)[:4000]
 				doc.progress = 0
 				doc.save(ignore_permissions=True)
 			frappe.db.commit()

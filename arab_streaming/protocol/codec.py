@@ -42,12 +42,21 @@ def value(item):
 	return item
 
 
+def is_local_streaming_role(role):
+	import re
+
+	return bool(isinstance(role, str) and re.fullmatch(r"Arab Streaming [a-f0-9]{12}", role))
+
+
 def snapshot(doc):
 	result = {"doctype": doc.doctype, "name": doc.name, "docstatus": int(doc.docstatus)}
 	for field in transferable_fields(doc.meta):
 		name = field.fieldname
 		if field.fieldtype in ("Table", "Table MultiSelect"):
-			result[name] = [snapshot(child) for child in doc.get(name) or []]
+			children = doc.get(name) or []
+			if doc.doctype == "User" and name == "roles":
+				children = [child for child in children if not is_local_streaming_role(child.role)]
+			result[name] = [snapshot(child) for child in children]
 		else:
 			item = doc.get(name)
 			# Frappe writes empty numeric fields as zero and reloads decimal

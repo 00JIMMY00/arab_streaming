@@ -66,7 +66,7 @@ def validate_action(doc, method=None, old=None, new=None, merge=False):
 				continue
 			if doc.is_new():
 				if doc.meta.has_field("amended_from") and doc.get("amended_from"):
-					if not row.get("allow_amend") and row.get("allow_creation"):
+					if not row.get("allow_amend"):
 						frappe.throw("Amend is controlled by the connected owning site")
 				elif not row.get("allow_creation"):
 					frappe.throw("Creation is controlled by the connected owning site")

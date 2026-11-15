@@ -95,7 +95,7 @@
    "fieldname": "branch_field",
    "fieldtype": "Data",
    "label": "Branch Field",
-   "description": "Branch link, table.branch link, or linked_document.branch link. Shared records require no Branch."
+   "description": "Branch link, table.branch, linked_document.branch, or an installed app resolver (app:alias). Shared records require no Branch."
   },
   {
    "fieldname": "conditions",

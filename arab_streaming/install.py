@@ -52,7 +52,9 @@ def ensure_configuration():
 	ensure_indexes()
 	from arab_streaming.streaming.policy import ensure_dimension, migrate_legacy_rules, migrate_rule_contract
 
-	if frappe.conf.get("arab_streaming_site_role") in ("Master", "Slave"):
+	if frappe.conf.get("arab_streaming_site_role") in ("Master", "Slave") and not any(
+		frappe.get_hooks("arab_streaming_managed_branch_routing")
+	):
 		ensure_dimension()
 	migrate_legacy_rules()
 	migrate_rule_contract()

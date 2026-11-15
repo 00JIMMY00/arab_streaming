@@ -1,3 +1,9 @@
+## RMS release-group installation — 2026-11-15
+
+For the RMS product, include the applications in one release group in this order: **Frappe → ERPNext → Arab Streaming → RMS**. Arab Streaming already requires ERPNext; RMS now declares Arab Streaming as a required application. The current RMS site uses Frappe/ERPNext 15.122.0 and Arab Streaming 0.2.0. Its native site installation and workspace were verified; existing other apps were retained.
+
+The RMS site is not configured as a Master or Slave and has no peers/rules yet. Installing the app does not start remote synchronization. The existing historical master/slave deployment described below is a different environment. Hosting-provider group registration is outside this site-installation verification.
+
 ## Linked contacts and addresses
 
 Customer synchronization includes linked Contacts and Addresses, including non-primary records. New records and later edits, unlinking, deletion and ordinary renaming follow the Customer rule automatically. Shared associations are projected for each peer, unrelated receiver links are preserved, and conflicting local edits require review. Normal permissions, validation and rule direction/branch restrictions still apply. Linked-only updates avoid saving an unchanged Customer; ERPNext may legitimately update a stored primary-address display when the address itself changes.
@@ -64,3 +70,24 @@ Saved Instance Key forms provide an Administrator-only **Show API Secret** butto
 Canonical source: local-personal2:/home/xxx/bench1/my-bench/apps/arab_streaming. Slave: contabo1:/home/jimmy/arab-streaming-test/apps/arab_streaming. Documentation retains the existing Git ignore policy. No Git commit or push is implied by deployment.
 
 License: MIT.
+
+
+### RMS consumer profile and application routing
+
+RMS can prepare its general 58-rule profile without activating delivery. Its optional Store-to-Branch link routes POS wrappers; an installed `app:rms_store` resolver and existing Branch Assignment records route native ERP transactions. The engine supports installed `arab_streaming_branch_resolvers`, `arab_streaming_after_apply`, `arab_streaming_local_doctypes`, `arab_streaming_local_fields` and `arab_streaming_managed_branch_routing` hooks. Resolver callbacks receive `(document, config, peer=None, incoming=False)`; post-apply callbacks receive `(peer, source_document, target_document, config)`. These are server-installed extensions, never executable code from a peer payload.
+
+Linked/app scopes are checked per document during copy and stock reconciliation; supplied paths do not create extra Branch fields. App-managed routing opts out of automatic dimensions, while ordinary deployments keep dimension setup. Operational naming-series documents receive writer/Branch partitions even when not submittable. Incoming amendment restrictions cannot be bypassed by disabled ordinary creation. Use matching app/engine code and complete first-pair lifecycle acceptance; the RMS site's prepared defaults have no connected peer and do not certify financial history import.
+
+## First-run consumer bootstrap (0.2.1)
+
+Installed consumers can register `arab_streaming_defer_initial_links` callbacks
+returning optional Link/Table field names for a new authenticated bootstrap document.
+The executor rejects mandatory/scalar fields and restores the original snapshot
+through normal permissions and controllers in the same transaction. RMS uses this
+only for first-run Store and Brand/Menu cycles; normal event execution is unchanged without an
+explicit consumer decision. Company scaffolding and Setup Wizard ownership remain
+in RMS. Use matching 0.2.1 engine/RMS sources for its Master/Slave first-run flow.
+
+Generated execution-role assignments stay local during User transfer. Price List
+execution includes its native default-list writes to Buying/Selling Settings with
+scoped permissions. Failed initial copies retain a context-free diagnostic stack.

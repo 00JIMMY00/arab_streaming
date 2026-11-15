@@ -39,10 +39,9 @@ def selection(config, peer, before=None, after=None):
 	if after:
 		filters.append(["name", ">", after])
 	field = config.get("branch_field") or ""
-	direct = config.get("scope") == "Shared" or (
-		config.get("scope") == "Branch" and "." not in field and bool(field)
-	)
-	if config.get("scope") == "Branch" and field and "." not in field:
+	direct_field = bool(field) and "." not in field and not field.startswith("app:")
+	direct = config.get("scope") == "Shared" or (config.get("scope") == "Branch" and direct_field)
+	if config.get("scope") == "Branch" and direct_field:
 		filters.append([field, "=", peer.restaurant_branch])
 	return filters, direct
 

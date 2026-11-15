@@ -12,6 +12,21 @@ from arab_streaming.streaming.context import replay
 from arab_streaming.streaming.guards import system_write
 
 
+def defer_initial_links(peer, source_document, document, meta, deferred):
+	"""Stage consumer-approved optional links/tables, retaining the complete source."""
+	fields = []
+	for handler in frappe.get_hooks("arab_streaming_defer_initial_links"):
+		for fieldname in frappe.get_attr(handler)(peer, source_document) or []:
+			field = meta.get_field(fieldname)
+			if not field or field.fieldtype not in ("Link", "Table", "Table MultiSelect") or field.reqd:
+				frappe.throw("Only optional Link or Table fields can be deferred during bootstrap")
+			if document.get(fieldname):
+				deferred[(source_document["doctype"], source_document["name"])] = source_document
+				document[fieldname] = None if field.fieldtype == "Link" else []
+				fields.append(fieldname)
+	return fields
+
+
 def apply_document(
 	peer,
 	document,
@@ -36,6 +51,10 @@ def apply_document(
 	from arab_streaming.streaming.policy import config_for
 
 	config = config_for(peer, document["doctype"], incoming=True) if peer.get("restaurant_branch") else None
+
+	def after_apply(target):
+		for handler in frappe.get_hooks("arab_streaming_after_apply"):
+			frappe.get_attr(handler)(peer, source_document, target, config)
 	# A preserve-existing copy needs no attachment/password/dependency transfers.
 	if policy == "Skip":
 		from arab_streaming.streaming.mapping import mapped_name
@@ -59,6 +78,15 @@ def apply_document(
 	if desired_status and not meta.is_submittable:
 		frappe.throw("Only submittable business documents can carry submitted/cancelled state")
 	exists = bool(meta.issingle) or frappe.db.exists(doctype, name)
+	dependency_document = source_document
+	if not exists:
+		# Installed consumers may stage optional cyclic links during authenticated
+		# first-run bootstrap. Restore them in this same transaction after creation.
+		deferred_fields = defer_initial_links(peer, source_document, document, meta, deferred)
+		if deferred_fields:
+			dependency_document = copy.deepcopy(source_document)
+			for fieldname in deferred_fields:
+				dependency_document[fieldname] = None
 	target = frappe.get_doc(doctype, name) if exists else None
 	if target:
 		target.check_permission("read")
@@ -74,12 +102,17 @@ def apply_document(
 		frappe.throw("The target already exists and the captured policy is Throw Error")
 	if target:
 		if not password_values and digest(snapshot(target)) == digest(document):
+			after_apply(target)
 			remember(peer, source_document, target)
 			return "Success", None
 		target.check_permission("write")
 	check_base(peer, source_document, target, base_digest)
 	if target and target.docstatus == 1 and desired_status == 2:
+		target.flags.streaming_target_docstatus = desired_status
+		if meta.has_field("status"):
+			target.status = document.get("status")
 		target.cancel()
+		after_apply(target)
 		remember(peer, source_document, target)
 		return "Success", None
 	if not ignore_links:
@@ -89,7 +122,7 @@ def apply_document(
 		if depth > 10 or len(seen) > 200:
 			frappe.throw("Dependency traversal limit reached")
 		seen.add((source_document["doctype"], source_document["name"]))
-		for linked_type, linked_name, path in linked_records(source_document):
+		for linked_type, linked_name, path in linked_records(dependency_document):
 			identity = (linked_type, linked_name)
 			# A back-reference to this very graph is not another pending event.
 			if identity in seen:
@@ -178,6 +211,13 @@ def apply_document(
 	doc = target or frappe.get_doc(dict(document, docstatus=0))
 	values = {key: item for key, item in document.items() if key not in ("doctype", "name", "docstatus")}
 	if target:
+		if doctype == "User" and "roles" in values:
+			from arab_streaming.protocol.codec import is_local_streaming_role
+
+			# Receiver execution permissions are local even when User profiles sync.
+			values["roles"] = list(values["roles"] or []) + [
+				row.as_dict() for row in target.roles if is_local_streaming_role(row.role)
+			]
 		if target.docstatus == 2:
 			if desired_status != 2:
 				frappe.throw("A cancelled target cannot be silently reopened")
@@ -191,6 +231,7 @@ def apply_document(
 	apply_passwords(doc, password_values)
 	if meta.has_field("set_posting_time"):
 		doc.set_posting_time = 1
+	doc.flags.streaming_target_docstatus = desired_status
 	if doctype == "User":
 		doc.flags.no_welcome_mail = True
 	if doctype == "Item":
@@ -206,6 +247,7 @@ def apply_document(
 		doc.submit()
 	if desired_status == 2 and doc.docstatus == 1:
 		doc.cancel()
+	after_apply(doc)
 	attach(document)
 	remember(peer, source_document, doc)
 	if outermost:

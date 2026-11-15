@@ -1,3 +1,7 @@
+## 2026-11-15 — Arab Streaming is available in RMS
+
+Installed Arab Streaming on the RMS site and made its workspace available in Management. The requested installation chain is Frappe, ERPNext, Arab Streaming, then RMS. Verified the site's startup/catalog reads and preserved existing business records. No connection, execution key, branch selection or data rule was created; synchronization becomes an operational configuration step after the intended master/branch arrangement is supplied.
+
 ## 2026-10-30 — Contacts and addresses now follow customer changes
 
 Deployed the linked-record fix to both sites and repaired the existing missed associations. Contacts/addresses added after the customer, subsequent edits, removed links and normal deletion/renaming now enter the synchronization workflow automatically, including multiple non-primary contacts. Fixed the circular dependency failure and false conflict checkpoints. Shared links and independent local edits retain their safeguards. All 88 automated tests passed, and a temporary live customer completed automatic add/edit/delete verification and cleanup.
@@ -84,3 +88,18 @@ Synchronization remains under development. Authentication, Link/Ping, initial co
 ## 2026-10-27 — Instance Key credential display
 
 Added an Administrator-only **Show API Secret** button to saved Instance Key forms. It displays the Access Key and API Secret in a temporary dialog, clears the secret on close, and uses the existing protected server method. No credential regeneration or permission change is involved.
+
+
+## 2026-11-15 — RMS prepared for future branch connections
+
+Prepared 58 editable RMS rules (41 master-to-branch, 12 branch-to-master and 5 bidirectional), connected its three Store definitions to Branch identities, and supplied 46 initial-copy suggestions for a new branch. Transport, site role, peers and credentials remain unconfigured. Arabic documentation includes every setting's 1/0 meaning and a comparison of 103 reference document types. The reference source was read only; RMS implementation is independent.
+
+Application routing preserves branch ownership without adding fields to every transaction. Replica checks retain original POS states/rounding and prevent duplicate waste/expense movements or invoice consolidation. Security approvals, print queues and generated records stay local. Verified 127 focused read-only/mocked tests, 138 operational scope checks, rule directions/idempotence, unchanged business/ledger counts and the current RMS site's HTTPS health. A real branch connection and two-site financial acceptance have not been tested.
+
+## 2026-11-15 — RMS first-run dependency support
+
+Arab Streaming 0.2.1 includes the existing RMS routing compatibility changes and
+an optional-link deferral hook for authenticated consumer bootstrap. Optional
+cyclic Store references are restored inside the item transaction with normal
+validation. The RMS app supplies the role-selection/connection UI and company
+bootstrap; installing the engine alone does not activate a site or pair a branch.
