@@ -6,7 +6,46 @@ import frappe
 from arab_streaming.protocol.codec import digest, snapshot
 from arab_streaming.streaming.adapters import SAFE_TYPES, condition_fields, linked_records, require_supported
 from arab_streaming.streaming.conditions import filters, parse
-from arab_streaming.streaming.guards import system_write
+from arab_streaming.streaming.guards import require_system_write, system_write
+
+
+def write_snapshot_items(items):
+	"""Persist internal immutable artifacts in batches; business saves stay native."""
+	require_system_write()
+	fields = [
+		"name",
+		"creation",
+		"modified",
+		"owner",
+		"modified_by",
+		"docstatus",
+		"export",
+		"row_key",
+		"position",
+		"reference_doctype",
+		"reference_name",
+		"data",
+		"files",
+		"protected_version",
+		"payload_digest",
+	]
+	now = frappe.utils.now_datetime()
+	values = []
+	for item in items:
+		if not isinstance(item.get("row_key"), str) or not 1 <= len(item["row_key"]) <= 140:
+			frappe.throw("Invalid snapshot row identity")
+		values.append(
+			[
+				frappe.generate_hash(length=20),
+				now,
+				now,
+				frappe.session.user,
+				frappe.session.user,
+				0,
+				*[item.get(field) for field in fields[6:]],
+			]
+		)
+	frappe.db.bulk_insert("Streaming Snapshot Item", fields, values, chunk_size=4)
 
 
 def selection(row):
@@ -72,7 +111,7 @@ def prepare_export(state, request_id, configuration):
 	else:
 		start, total = time.monotonic(), 0
 		dependencies = set()
-		budget = {"bytes": 0, "started": start}
+		budget = {"bytes": 0, "started": start, "items": []}
 		with system_write():
 			export = frappe.get_doc(
 				dict(
@@ -90,6 +129,9 @@ def prepare_export(state, request_id, configuration):
 				from arab_streaming.streaming.export_policy import selected_names
 
 				peer = frappe.get_doc(state.instance_type, state.instance_name)
+				from arab_streaming.streaming.policy import config_for
+
+				rule = config_for(peer, row["doctype_name"])
 				names = list(selected_names(peer, row))
 				for position, name in enumerate(names):
 					total += 1
@@ -100,10 +142,8 @@ def prepare_export(state, request_id, configuration):
 					from arab_streaming.streaming.files import freeze as freeze_files
 
 					files = freeze_files(document)
-					from arab_streaming.streaming.policy import config_for
 					from arab_streaming.streaming.protected import freeze as freeze_passwords
 
-					rule = config_for(peer, doc.doctype)
 					protected_version = (
 						freeze_passwords(document) if rule and rule.include_passwords else None
 					)
@@ -114,7 +154,7 @@ def prepare_export(state, request_id, configuration):
 						frappe.throw(
 							"Initial snapshot scope exceeds the current bounded export limits; narrow the row conditions"
 						)
-					frappe.get_doc(
+					budget["items"].append(
 						dict(
 							doctype="Streaming Snapshot Item",
 							export=export.name,
@@ -127,9 +167,10 @@ def prepare_export(state, request_id, configuration):
 							protected_version=protected_version,
 							payload_digest=digest(document),
 						)
-					).insert(ignore_permissions=True)
+					)
 					if not row.get("ignore_links"):
 						store_dependencies(export.name, document, dependencies, budget)
+			write_snapshot_items(budget["items"])
 			export.total_count = total
 			export.save(ignore_permissions=True)
 	counts = [
@@ -169,7 +210,7 @@ def store_dependencies(export_name, document, seen, budget, depth=0):
 			frappe.throw("Initial dependency snapshot exceeds the bounded export budget")
 		if len(encoded.encode()) > 1_000_000:
 			frappe.throw("One initial dependency exceeds the supported payload limit")
-		frappe.get_doc(
+		budget["items"].append(
 			dict(
 				doctype="Streaming Snapshot Item",
 				export=export_name,
@@ -181,7 +222,7 @@ def store_dependencies(export_name, document, seen, budget, depth=0):
 				files=json.dumps(files),
 				payload_digest=digest(data),
 			)
-		).insert(ignore_permissions=True)
+		)
 		store_dependencies(export_name, data, seen, budget, depth + 1)
 
 

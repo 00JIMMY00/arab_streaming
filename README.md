@@ -1,3 +1,12 @@
+## 2026-11-15 — Batch internal export snapshot artifacts
+
+Version 0.2.5 writes the internal Streaming Snapshot Item artifacts in small
+batches under the existing system-write context. Business documents still pass
+ordinary source read checks and native receiving controllers. Canonical payloads,
+file/protected references, identities, digests and the enclosing transaction remain
+unchanged. Resolve each row's rule once while the source policy fence is held.
+This reduces snapshot preparation overhead without extending its work budgets.
+
 ## 2026-11-15 — Avoid exporting preserved receiver definitions again
 
 Before the first export request, a copy run freezes the existing receiver names
