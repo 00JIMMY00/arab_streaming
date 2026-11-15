@@ -1,3 +1,13 @@
+## 2026-11-15 — Avoid exporting preserved receiver definitions again
+
+Before the first export request, a copy run freezes the existing receiver names
+for Preserve Existing rows. The master applies them only as additional exclusions
+inside the already-authorized selection; Update rows cannot use this exclusion.
+The baseline is persisted before the request, remains unchanged on Continue and
+does not count as an operator configuration edit. Source graph traversal allows
+up to the same 10,000-record scale as roots while retaining depth, byte and time
+bounds. Company scaffolds still receive their full Update snapshots.
+
 ## 2026-11-15 — Packaged app images during synchronization
 
 Version 0.2.3 accepts `/assets/<installed-app>/...` images after validating that

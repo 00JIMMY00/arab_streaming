@@ -14,6 +14,17 @@ def selection(row):
 	predicate = filters(parse(row.get("conditions"), condition_fields(row["doctype_name"])))
 	if row.get("sync_from") and not frappe.get_meta(row["doctype_name"]).issingle:
 		predicate.append(["creation", ">=", frappe.utils.get_datetime(row["sync_from"])])
+	existing = row.get("existing_names")
+	if existing is not None:
+		if (
+			row.get("skip_if_exists") not in (1, True)
+			or not isinstance(existing, list)
+			or len(existing) > 10000
+			or any(not isinstance(name, str) or not name for name in existing)
+		):
+			frappe.throw("Invalid preserve-existing snapshot selection")
+		if existing:
+			predicate.append(["name", "not in", existing])
 	return predicate
 
 
@@ -134,7 +145,7 @@ def prepare_export(state, request_id, configuration):
 
 
 def store_dependencies(export_name, document, seen, budget, depth=0):
-	if depth > 10 or len(seen) > 200:
+	if depth > 10:
 		frappe.throw("Initial snapshot dependency traversal limit reached")
 	require_supported(document["doctype"])
 	for linked_type, name, _path in linked_records(document):
@@ -143,6 +154,8 @@ def store_dependencies(export_name, document, seen, budget, depth=0):
 		identity = (linked_type, name)
 		if identity in seen:
 			continue
+		if len(seen) >= 10000:
+			frappe.throw("Initial snapshot dependency traversal limit reached")
 		seen.add(identity)
 		doc = frappe.get_doc(*identity)
 		doc.check_permission("read")

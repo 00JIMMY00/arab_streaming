@@ -40,6 +40,23 @@ def configuration(doc):
 	]
 
 
+def operator_configuration(rows):
+	# Receiver baselines are frozen per run, not editable connection settings.
+	return [{key: value for key, value in row.items() if key != "existing_names"} for row in rows]
+
+
+def include_existing_names(rows):
+	result = []
+	for original in rows:
+		row = dict(original)
+		if row.get("skip_if_exists") and "existing_names" not in row:
+			names = frappe.get_list(row["doctype_name"], pluck="name", limit_page_length=10001)
+			# Large local tables retain the original bounded-copy behavior.
+			row["existing_names"] = names if len(names) <= 10000 else []
+		result.append(row)
+	return result
+
+
 def counts(name):
 	doc = master_connection(name)
 	if doc.connection_status != "Connected" or doc.syncing_status == "In Progress":
@@ -90,7 +107,7 @@ def start(name, continuing=False, paired_peer=None):
 			if not names:
 				frappe.throw("There is no failed run to Continue")
 			run = frappe.get_doc("Streaming Initial Sync Run", names[0], for_update=True)
-			if frappe.parse_json(run.configuration) != configuration(doc):
+			if operator_configuration(frappe.parse_json(run.configuration)) != configuration(doc):
 				frappe.throw("Configuration changed; start a new initial copy instead of Continue")
 			run.status = "In Progress"
 		else:
@@ -213,6 +230,15 @@ def run_initial(name, run_name, token):
 		doc, run = locked_run(name, run_name, token)
 		rows = frappe.parse_json(run.configuration)
 		if not run.remote_export:
+			prepared_rows = include_existing_names(rows)
+			if prepared_rows != rows:
+				with system_write():
+					run.configuration = json.dumps(prepared_rows)
+					run.save(ignore_permissions=True)
+				# A timeout may occur after the master commits its export. Persist the
+				# exact baseline first so the retry uses the same immutable request.
+				frappe.db.commit()
+				rows = prepared_rows
 			result = remote_call(
 				doc,
 				"arab_streaming.api.bootstrap.prepare",
@@ -336,8 +362,12 @@ def run_initial(name, run_name, token):
 		frappe.db.rollback()
 		try:
 			doc, run = locked_run(name, run_name, token)
-			frappe.log_error(title="Streaming initial copy failed", message=traceback,
-				reference_doctype="Master Instance", reference_name=name)
+			frappe.log_error(
+				title="Streaming initial copy failed",
+				message=traceback,
+				reference_doctype="Master Instance",
+				reference_name=name,
+			)
 			with system_write():
 				run.status = "Failed"
 				run.save(ignore_permissions=True)
