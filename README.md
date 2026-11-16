@@ -1,3 +1,14 @@
+## 2026-11-16 — Business target selection for installed apps
+
+Version 0.2.17 lets an installed app provide connection targets. RMS presents
+Store only, resolves its transport scope on the authenticated master, and shows
+the connected Store in both peer forms. Plain ERPNext installations keep Branch
+selection. Providers authorize their business resource before pairing; the native
+pair identity, uniqueness, generation, replay and operational scope guards stay
+in place. The Store provider manages its backing scope automatically and keeps
+existing pair identities. New wire endpoints remain restricted to authenticated
+streaming credentials; Desk link actions keep the existing operator checks.
+
 ## 2026-11-16 — Query branch ownership without displaying an error
 
 Version 0.2.16 adds `can_operate_branch` for selector filtering. It returns a

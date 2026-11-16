@@ -10,6 +10,7 @@
  "allow_rename": 0,
  "field_order": [
   "connection_tab",
+  "connection_target",
   "restaurant_branch",
   "domain",
   "api_key",
@@ -82,7 +83,7 @@
   {
    "fieldname": "syncing_doctypes",
    "fieldtype": "Table",
-   "label": "Automatic changes: master \u2192 this slave",
+   "label": "Automatic changes: master → this slave",
    "options": "Instance Syncing Doctype",
    "description": "Add Item or UOM here to send changes made on this master to this slave. Conditions blank = every record of that DocType. Save; future changes are queued automatically. To copy older records, use Copy Existing Records on the slave Master Instance.",
    "hidden": 1,
@@ -94,7 +95,7 @@
    "label": "Rules received from slave (diagnostics)",
    "options": "JSON",
    "read_only": 1,
-   "description": "Read-only information refreshed by Ping from the slave. Configure slave \u2192 master rules on the slave Master Instance."
+   "description": "Read-only information refreshed by Ping from the slave. Configure slave → master rules on the slave Master Instance."
   },
   {
    "fieldname": "outgoing_tab",
@@ -109,6 +110,12 @@
   {
    "fieldname": "streaming_rules_summary",
    "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "connection_target",
+   "fieldtype": "HTML",
+   "label": "Connection target",
+   "hidden": 1
   }
  ],
  "permissions": [

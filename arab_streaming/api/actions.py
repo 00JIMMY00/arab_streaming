@@ -9,6 +9,20 @@ def eligible_branches(name):
 
 
 @frappe.whitelist(methods=["POST"])
+def connection_targets(name):
+	from arab_streaming.streaming.targets import eligible_targets
+
+	return eligible_targets(name)
+
+
+@frappe.whitelist(methods=["POST"])
+def link_target(name, target):
+	from arab_streaming.streaming.targets import link_target as link
+
+	return link(name, target)
+
+
+@frappe.whitelist(methods=["POST"])
 def link(name, branch):
 	return connections.link_connection(name, branch)
 

@@ -16,6 +16,7 @@
   "progress",
   "summary_column",
   "enabled",
+  "connection_target",
   "restaurant_branch",
   "slave_name",
   "connection_details",
@@ -163,9 +164,9 @@
   {
    "fieldname": "initial_sync_doctypes",
    "fieldtype": "Table",
-   "label": "Copy existing records: master \u2192 this slave",
+   "label": "Copy existing records: master → this slave",
    "options": "Instance Initial Sync Doctype",
-   "description": "Used only when you click Copy Existing Records \u2192 Sync. This table does not enable automatic syncing of future changes. Conditions blank = all records of that DocType."
+   "description": "Used only when you click Copy Existing Records → Sync. This table does not enable automatic syncing of future changes. Conditions blank = all records of that DocType."
   },
   {
    "fieldname": "ongoing_tab",
@@ -175,9 +176,9 @@
   {
    "fieldname": "syncing_doctypes",
    "fieldtype": "Table",
-   "label": "Automatic changes: this slave \u2192 master",
+   "label": "Automatic changes: this slave → master",
    "options": "Instance Syncing Doctype",
-   "description": "Controls new saves on THIS slave. To send master changes here, edit the Slave Instance on the master. Conditions blank = every record; a name condition restricts sync to those names. Save, then Connection \u2192 Ping to refresh the other site.",
+   "description": "Controls new saves on THIS slave. To send master changes here, edit the Slave Instance on the master. Conditions blank = every record; a name condition restricts sync to those names. Save, then Connection → Ping to refresh the other site.",
    "hidden": 1,
    "read_only": 1
   },
@@ -230,11 +231,17 @@
    "label": "Rules received from master (diagnostics)",
    "options": "JSON",
    "read_only": 1,
-   "description": "Read-only information refreshed by Ping. Configure master \u2192 slave rules on the master Slave Instance."
+   "description": "Read-only information refreshed by Ping. Configure master → slave rules on the master Slave Instance."
   },
   {
    "fieldname": "streaming_rules_summary",
    "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "connection_target",
+   "fieldtype": "HTML",
+   "label": "Connection target",
+   "hidden": 1
   }
  ],
  "permissions": [

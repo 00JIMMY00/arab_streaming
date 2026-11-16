@@ -34,6 +34,9 @@ scheduler_events = {
 
 extend_bootinfo = "arab_streaming.boot.extend_bootinfo"
 
+doc_events["Master Instance"] = {"onload": "arab_streaming.streaming.targets.load_view"}
+doc_events["Slave Instance"] = {"onload": "arab_streaming.streaming.targets.load_view"}
+
 doc_events["File"] = {"on_update": "arab_streaming.streaming.files.changed"}
 
 doc_events["*"]["before_naming"] = "arab_streaming.streaming.naming.before_naming"

@@ -32,7 +32,7 @@ def capabilities(protocol, version):
 		version=VERSION,
 		role="Master",
 		site_id=site_id(),
-		capabilities=["dynamic_rules", "branch_scope", "lifecycle", "peer_push", "files"],
+		capabilities=["dynamic_rules", "branch_scope", "lifecycle", "peer_push", "files", "connection_targets"],
 		metadata_driven=True,
 	)
 
@@ -50,15 +50,34 @@ def branches(protocol, version):
 
 
 @frappe.whitelist(methods=["POST"])
+def targets(protocol, version):
+	authorize(protocol, version)
+	from arab_streaming.streaming.targets import choices
+
+	return choices()
+
+
+@frappe.whitelist(methods=["POST"])
+def resolve_target(protocol, version, target):
+	authorize(protocol, version)
+	from arab_streaming.streaming.targets import resolve
+
+	return resolve(target)
+
+
+@frappe.whitelist(methods=["POST"])
 def link(protocol, version, branch, request_id, facts):
 	key = authorize(protocol, version)
 	facts = validate_facts(facts, "Slave")
 	if not isinstance(request_id, str) or not re.fullmatch(r"[a-f0-9-]{36}", request_id):
 		frappe.throw("Invalid link request identity")
 	branch_doc = frappe.get_doc("Branch", branch, for_update=True)
-	branch_doc.check_permission("read")
 	if not branch_doc.custom_streaming_enabled or facts.get("branch") != branch:
 		frappe.throw("This branch is not enabled for streaming")
+	from arab_streaming.streaming.targets import provider
+
+	if provider("validate", branch=branch) is not True:
+		branch_doc.check_permission("read")
 	state_name = frappe.db.get_value("Streaming Peer State", {"link_request_id": request_id})
 	with system_write():
 		if state_name:

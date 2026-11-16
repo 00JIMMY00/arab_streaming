@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 
 import frappe
@@ -31,6 +32,8 @@ def peer_state(instance_type, instance_name, lock=False):
 
 
 def local_facts(instance):
+	from arab_streaming.streaming.targets import describe
+
 	return dict(
 		protocol=PROTOCOL,
 		version=VERSION,
@@ -44,6 +47,7 @@ def local_facts(instance):
 		),
 		branch=instance.restaurant_branch,
 		instance_name=instance.name,
+		connection_target=describe(instance),
 		rules=[
 			{
 				key: row.get(key)
@@ -66,6 +70,19 @@ def validate_facts(facts, expected_role):
 		frappe.throw("Unexpected remote streaming role or site identity")
 	if not isinstance(facts.get("rules"), list) or len(facts["rules"]) > 100:
 		frappe.throw("Invalid remote streaming rules")
+	target = facts.get("connection_target")
+	if target is not None and (
+		not isinstance(target, dict)
+		or not isinstance(target.get("doctype"), str)
+		or not re.fullmatch(r"[\w -]{1,140}", target["doctype"])
+		or not isinstance(target.get("label"), str)
+		or len(target["label"]) > 140
+		or (
+			target.get("name") is not None
+			and (not isinstance(target["name"], str) or len(target["name"]) > 140)
+		)
+	):
+		frappe.throw("Invalid remote connection target")
 	for row in facts["rules"]:
 		if not isinstance(row, dict) or not isinstance(row.get("doctype_name"), str):
 			frappe.throw("Invalid remote streaming rule")
