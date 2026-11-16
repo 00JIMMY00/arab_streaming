@@ -1,3 +1,13 @@
+## 2026-11-16 — Branch writer guard for interactive applications
+
+Version 0.2.7 exposes `ownership.assert_local_branch_writer(branch)` for consuming
+applications. A paired Master cannot operate that Slave's branch; a Slave can
+operate only its paired branch. Pausing transport or disabling a peer does not
+transfer branch ownership. Unlinking does. This guard does not grant replay
+permissions or change rule configuration. Consumers must call it at their
+interactive operation boundary. User passwords remain local under the current
+protocol; a password-only change intentionally emits no business Dispatch Event.
+
 ## 2026-11-15 — Preserve built-in identity references locally
 
 Version 0.2.6 retains Links to Administrator and Guest without freezing their

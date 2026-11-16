@@ -4,6 +4,24 @@ from arab_streaming.streaming.adapters import SAFE_TYPES
 from arab_streaming.streaming.context import replay_source
 
 
+def assert_local_branch_writer(branch):
+	"""Gate interactive branch work; pausing transport does not transfer ownership."""
+	role = frappe.conf.get("arab_streaming_site_role")
+	if role == "Master":
+		if branch and frappe.db.exists(
+			"Slave Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
+		):
+			frappe.throw(
+				"This Branch is operated by its paired Slave. Open the POS on that Slave.",
+				frappe.PermissionError,
+			)
+	elif role == "Slave":
+		if not branch or not frappe.db.exists(
+			"Master Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
+		):
+			frappe.throw("This site can operate only its paired Branch.", frappe.PermissionError)
+
+
 def policy_snapshot(parent_type):
 	import pymysql
 
