@@ -1,3 +1,12 @@
+## 2026-11-16 — Query branch ownership without displaying an error
+
+Version 0.2.16 adds `can_operate_branch` for selector filtering. It returns a
+boolean without calling frappe.throw or leaving a server message on successful
+requests. `assert_local_branch_writer` uses the same decision and still rejects
+operational calls to a paired Slave branch on the Master, or another branch on
+a Slave. Pausing transport does not change ownership. RMS uses the query for
+its POS/Kitchen selectors and local cashier-session checks.
+
 ## 2026-11-16 — Explicit Administrator password synchronization
 
 Version 0.2.15 adds a separate password-only opt-in for Administrator. Enable

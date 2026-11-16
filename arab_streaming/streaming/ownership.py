@@ -4,22 +4,35 @@ from arab_streaming.streaming.adapters import SAFE_TYPES
 from arab_streaming.streaming.context import replay_source
 
 
-def assert_local_branch_writer(branch):
-	"""Gate interactive branch work; pausing transport does not transfer ownership."""
+def can_operate_branch(branch):
+	"""Query local ownership without adding a UI message for an excluded Branch."""
 	role = frappe.conf.get("arab_streaming_site_role")
 	if role == "Master":
-		if branch and frappe.db.exists(
-			"Slave Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
-		):
-			frappe.throw(
-				"This Branch is operated by its paired Slave. Open the POS on that Slave.",
-				frappe.PermissionError,
+		return not (
+			branch
+			and frappe.db.exists(
+				"Slave Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
 			)
-	elif role == "Slave":
-		if not branch or not frappe.db.exists(
-			"Master Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
-		):
-			frappe.throw("This site can operate only its paired Branch.", frappe.PermissionError)
+		)
+	if role == "Slave":
+		return bool(
+			branch
+			and frappe.db.exists(
+				"Master Instance", {"restaurant_branch": branch, "connection_status": "Connected"}
+			)
+		)
+	return True
+
+
+def assert_local_branch_writer(branch):
+	"""Gate interactive branch work; pausing transport does not transfer ownership."""
+	if not can_operate_branch(branch):
+		message = (
+			"This Branch is operated by its paired Slave. Open the POS on that Slave."
+			if frappe.conf.get("arab_streaming_site_role") == "Master"
+			else "This site can operate only its paired Branch."
+		)
+		frappe.throw(message, frappe.PermissionError)
 
 
 def policy_snapshot(parent_type):

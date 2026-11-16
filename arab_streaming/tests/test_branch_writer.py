@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import frappe
 
-from arab_streaming.streaming.ownership import assert_local_branch_writer
+from arab_streaming.streaming.ownership import assert_local_branch_writer, can_operate_branch
 
 
 class TestBranchWriter(unittest.TestCase):
@@ -16,6 +16,7 @@ class TestBranchWriter(unittest.TestCase):
 			patch("frappe.throw", side_effect=frappe.PermissionError),
 		):
 			db.exists.return_value = paired
+			self.assertIs(can_operate_branch(branch), not blocked)
 			if blocked:
 				with self.assertRaises(frappe.PermissionError):
 					assert_local_branch_writer(branch)
@@ -42,3 +43,13 @@ class TestBranchWriter(unittest.TestCase):
 	def test_unconfigured_installation_is_unchanged(self):
 		db = self.check(None, "B1", False, False)
 		db.exists.assert_not_called()
+
+	def test_excluded_branch_query_never_emits_a_dialog(self):
+		with (
+			patch.object(frappe, "conf", frappe._dict(arab_streaming_site_role="Slave")),
+			patch.object(frappe, "db", Mock()) as db,
+			patch("frappe.throw") as throw,
+		):
+			db.exists.return_value = False
+			self.assertFalse(can_operate_branch("other"))
+			throw.assert_not_called()
