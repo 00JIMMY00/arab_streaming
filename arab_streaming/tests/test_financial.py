@@ -64,6 +64,25 @@ class TestFinancialLifecycle(FrappeTestCase):
 			self.assertEqual(self.ledger(source.name), expected_cancel)
 			self.assertEqual(frappe.get_doc("Sales Invoice", source.name).docstatus, 2)
 
+	def test_localized_tax_html_is_not_replayed_or_changed_after_submit(self):
+		frappe.db.savepoint("rendered_source")
+		source = invoice(self.fixtures)
+		source.submit()
+		document = snapshot(source)
+		expected = self.ledger(source.name)
+		self.assertNotIn("other_charges_calculation", document)
+		legacy = dict(document, other_charges_calculation="<div>foreign localized tax display</div>")
+		frappe.db.rollback(save_point="rendered_source")
+		with replay("rendering-test", self.fixtures["user"]):
+			peer = frappe._dict(doctype="Master Instance")
+			apply_document(peer, legacy)
+			apply_document(peer, legacy)
+		self.assertNotEqual(
+			frappe.get_doc("Sales Invoice", source.name).other_charges_calculation,
+			legacy["other_charges_calculation"],
+		)
+		self.assertEqual(self.ledger(source.name), expected)
+
 	def test_submitted_invoice_can_be_copied_without_a_prior_draft(self):
 		frappe.db.savepoint("source_trial")
 		source = invoice(self.fixtures)

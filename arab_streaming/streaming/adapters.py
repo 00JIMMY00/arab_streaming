@@ -123,6 +123,24 @@ LOCAL_FIELDS = {
 }
 
 
+# Localized HTML is rebuilt from the numeric tax rows by the native controller.
+TAX_RENDERING_TYPES = frozenset(
+	{
+		"Sales Invoice",
+		"POS Invoice",
+		"Purchase Invoice",
+		"Sales Order",
+		"Purchase Order",
+		"Delivery Note",
+		"Purchase Receipt",
+		"Quotation",
+		"Supplier Quotation",
+	}
+)
+for _tax_doctype in TAX_RENDERING_TYPES:
+	LOCAL_FIELDS[_tax_doctype] = LOCAL_FIELDS.get(_tax_doctype, frozenset()) | {"other_charges_calculation"}
+
+
 def require_supported(doctype):
 	if not is_business_doctype(doctype):
 		frappe.throw(
@@ -133,6 +151,7 @@ def require_supported(doctype):
 
 def transferable_fields(meta):
 	from arab_streaming.protocol.codec import EXCLUDE
+
 	local_fields = frozenset(frappe.get_hooks("arab_streaming_local_fields", {}).get(meta.name, []))
 
 	return [

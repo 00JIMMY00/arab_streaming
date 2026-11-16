@@ -1,3 +1,13 @@
+## 2026-11-16 — Keep localized tax rendering local
+
+Version 0.2.12 excludes other_charges_calculation (native localized tax-breakup
+HTML) from transaction snapshots. Actual tax rows, rates, totals and financial
+controller validation remain unchanged. Legacy immutable events may still contain
+the HTML; the local adapter discards only that derived display field. Prior local
+checkpoint digests can be recognized including their old rendered field, without
+accepting an unrelated business-data change. This prevents locale/currency-symbol
+HTML differences from blocking native updates after submission.
+
 ## 2026-11-16 — Recover native User contact row normalization safely
 
 Version 0.2.11 accepts an otherwise identical User Contact whose only differences

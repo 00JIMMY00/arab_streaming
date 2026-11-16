@@ -37,6 +37,11 @@ def mapped_name(peer, doctype, name):
 
 def local_document(peer, document, config=None):
 	result = copy.deepcopy(document)
+	from arab_streaming.streaming.adapters import TAX_RENDERING_TYPES
+
+	if result.get("doctype") in TAX_RENDERING_TYPES:
+		# Accept already-frozen older events without writing their local HTML.
+		result.pop("other_charges_calculation", None)
 
 	def walk(doc):
 		meta = frappe.get_meta(doc["doctype"])
@@ -76,7 +81,15 @@ def check_base(peer, document, target, base_digest):
 	if not base_digest or not target:
 		return
 	tracked = record(peer, document["doctype"], document["name"])
-	current = digest(snapshot(target))
+	current_snapshot = snapshot(target)
+	current = digest(current_snapshot)
+	from arab_streaming.streaming.adapters import TAX_RENDERING_TYPES
+
+	legacy_local = None
+	if target.doctype in TAX_RENDERING_TYPES:
+		legacy_local = digest(
+			dict(current_snapshot, other_charges_calculation=target.get("other_charges_calculation"))
+		)
 	if current == base_digest:
 		return
 	if same_native_user_contact(document, snapshot(target)):
@@ -84,7 +97,7 @@ def check_base(peer, document, target, base_digest):
 	if tracked:
 		if tracked.remote_digest == digest(document) and tracked.local_digest == current:
 			return
-		if tracked.remote_digest != base_digest or tracked.local_digest != current:
+		if tracked.remote_digest != base_digest or tracked.local_digest not in (current, legacy_local):
 			frappe.throw(
 				"Synchronization conflict: the source base or local record changed. Review the Capture Event before retrying."
 			)
