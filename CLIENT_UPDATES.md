@@ -1,3 +1,13 @@
+## 2026-11-16 — Preserve verified native financial defaults and closing reference identity
+
+Version 0.2.14 preserves an existing posted Item Group when an older source item
+snapshot leaves that read-only classification empty for the same Item. Financial
+fields still pass native update-after-submit checks. POS closing invoice-reference
+rows retain their local IDs only when the invoice link and every other row value
+are identical; changed amounts, dates or associations are not ignored. This allows
+already-applied native closing dependencies to converge without overwriting a
+newer state or weakening general conflict checks.
+
 ## 2026-11-16 — Apply native post-submit financial metadata narrowly
 
 Version 0.2.13 handles Sales Invoice status and POS Invoice status/consolidated

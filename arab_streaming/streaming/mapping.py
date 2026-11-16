@@ -56,6 +56,13 @@ def local_document(peer, document, config=None):
 
 	walk(result)
 	result["name"] = mapped_name(peer, document["doctype"], document["name"])
+	if result.get("doctype") == "POS Closing Entry" and frappe.db.exists("POS Closing Entry", result["name"]):
+		current = frappe.get_doc("POS Closing Entry", result["name"])
+		references = {row.pos_invoice: snapshot(row) for row in current.pos_transactions}
+		for row in result.get("pos_transactions") or []:
+			before = references.get(row.get("pos_invoice"))
+			if before and closing_reference_values(before) == closing_reference_values(row):
+				row["name"] = before["name"]
 	meta = frappe.get_meta(document["doctype"])
 	if result["name"] != document["name"] and (meta.autoname or "").startswith("field:"):
 		result[meta.autoname.split(":", 1)[1]] = result["name"]
@@ -146,3 +153,9 @@ def same_native_user_contact(source, target):
 		return value
 
 	return digest(normalized(source)) == digest(normalized(target))
+
+
+def closing_reference_values(row):
+	# These native reference rows have no independent business identity. Invoice
+	# links, amounts, dates, order and every other value remain compared exactly.
+	return {key: value for key, value in row.items() if key != "name"}

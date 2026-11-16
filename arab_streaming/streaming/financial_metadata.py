@@ -8,6 +8,15 @@ FIELDS = {"Sales Invoice": ("status",), "POS Invoice": ("status", "consolidated_
 def stage(target, document):
 	if not target or target.docstatus != 1 or document.get("docstatus") != 1:
 		return {}
+	# Initial native inserts may fill this read-only Item classification while
+	# older source snapshots leave it empty. Preserve that historical default;
+	# ordinary update-after-submit validation still checks every financial field.
+	if target.doctype in FIELDS:
+		current_rows = {row.name: row for row in target.get("items") or []}
+		for row in document.get("items") or []:
+			before = current_rows.get(row.get("name"))
+			if before and row.get("item_code") == before.item_code and not row.get("item_group"):
+				row["item_group"] = before.get("item_group")
 	changes = {}
 	for name in FIELDS.get(target.doctype, ()):
 		if name not in document or document[name] == target.get(name):

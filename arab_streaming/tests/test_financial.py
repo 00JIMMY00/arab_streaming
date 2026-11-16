@@ -93,7 +93,9 @@ class TestFinancialLifecycle(FrappeTestCase):
 		with replay("status-test", self.fixtures["user"]):
 			peer = frappe._dict(doctype="Master Instance")
 			apply_document(peer, document)
-			changed = dict(document, status="Credit Note Issued")
+			changed = copy.deepcopy(document)
+			changed["status"] = "Credit Note Issued"
+			changed["items"][0]["item_group"] = None
 			apply_document(peer, changed)
 			apply_document(peer, changed)
 		self.assertEqual(frappe.db.get_value("Sales Invoice", source.name, "status"), "Credit Note Issued")
