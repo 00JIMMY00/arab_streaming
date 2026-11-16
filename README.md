@@ -1,3 +1,12 @@
+## 2026-11-16 — Recover native User contact row normalization safely
+
+Version 0.2.11 accepts an otherwise identical User Contact whose only differences
+are generated phone/email child row IDs. All actual values, user identity, link
+ownership and other fields must still match; real content conflicts remain blocked.
+Password fetch authorization also checks the current pairing generation, and an
+unchanged password hash replay leaves existing receiver sessions intact. Queued
+User contact replay requires its persisted connection to remain linked.
+
 ## 2026-11-16 — Invalidate provisioned permissions after commit
 
 Version 0.2.10 clears provisioned DocType/user permission caches again after the

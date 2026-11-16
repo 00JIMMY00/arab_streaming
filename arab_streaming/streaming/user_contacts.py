@@ -22,6 +22,8 @@ def before_job(method, kwargs, transaction_type=None):
 	if state.instance_type != "Master Instance":
 		return
 	peer = frappe.get_doc("Master Instance", state.instance_name)
+	if peer.connection_status != "Connected":
+		return
 	from arab_streaming.streaming.policy import config_for
 
 	rule = config_for(peer, "User", incoming=True)

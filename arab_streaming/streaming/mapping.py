@@ -79,6 +79,8 @@ def check_base(peer, document, target, base_digest):
 	current = digest(snapshot(target))
 	if current == base_digest:
 		return
+	if same_native_user_contact(document, snapshot(target)):
+		return
 	if tracked:
 		if tracked.remote_digest == digest(document) and tracked.local_digest == current:
 			return
@@ -112,3 +114,22 @@ def remember(peer, source, target, event=None):
 		tracked.local_digest = digest(snapshot(frappe.get_doc(target.doctype, target.name)))
 		tracked.last_event = event
 		tracked.save(ignore_permissions=True)
+
+
+def same_native_user_contact(source, target):
+	"""Native User jobs can allocate new phone/email row IDs for identical values."""
+	if (
+		source.get("doctype") != "Contact"
+		or not source.get("user")
+		or source.get("user") != target.get("user")
+	):
+		return False
+
+	def normalized(document):
+		value = copy.deepcopy(document)
+		for field in ("phone_nos", "email_ids"):
+			for row in value.get(field) or []:
+				row.pop("name", None)
+		return value
+
+	return digest(normalized(source)) == digest(normalized(target))

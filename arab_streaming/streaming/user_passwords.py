@@ -110,6 +110,17 @@ def fetch(peer, event_name, version_name):
 		or not any(r.instance_type == peer.doctype and r.instance_name == peer.name for r in event.instances)
 	):
 		frappe.throw("Password version is not addressed to this peer", frappe.PermissionError)
+	from arab_streaming.streaming.connections import peer_state
+
+	state = peer_state(peer.doctype, peer.name)
+	if not any(
+		r.instance_type == peer.doctype
+		and r.instance_name == peer.name
+		and r.pairing_id == state.pairing_id
+		and str(r.pairing_generation) == str(state.pairing_generation)
+		for r in event.instances
+	):
+		frappe.throw("Password event belongs to another pairing generation", frappe.PermissionError)
 	from arab_streaming.streaming.policy import authorize_document, config_for
 
 	config = config_for(peer, "User")
@@ -163,6 +174,12 @@ def apply(peer, capture_doc, data):
 		or passlibctx.identify(hashed) not in ("pbkdf2_sha256", "argon2")
 	):
 		frappe.throw("Invalid password version")
+	current = frappe.db.sql(
+		"SELECT password FROM `__Auth` WHERE doctype='User' AND name=%s AND fieldname='password' AND encrypted=0",
+		user,
+	)
+	if current and current[0][0] == hashed:
+		return  # Idempotent retries do not invalidate an unchanged user's sessions.
 	frappe.db.sql(
 		"INSERT INTO `__Auth` (doctype,name,fieldname,password,encrypted) VALUES ('User',%s,'password',%s,0) ON DUPLICATE KEY UPDATE password=VALUES(password),encrypted=0",
 		(user, hashed),

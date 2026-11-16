@@ -50,3 +50,26 @@ class TestFixedSeries(unittest.TestCase):
 				{"user": {"name": "cashier@example.invalid", "flags": {"streaming_source": "forged"}}},
 			)
 			replay.assert_not_called()
+
+
+class TestNativeUserContactNormalization(unittest.TestCase):
+	def test_only_generated_phone_email_ids_can_be_normalized(self):
+		from copy import deepcopy
+
+		from arab_streaming.streaming.mapping import same_native_user_contact
+
+		source = {
+			"doctype": "Contact",
+			"name": "c",
+			"user": "u@example.invalid",
+			"phone_nos": [{"name": "source-row", "phone": "123"}],
+			"links": [],
+		}
+		target = deepcopy(source)
+		target["phone_nos"][0]["name"] = "local-row"
+		self.assertTrue(same_native_user_contact(source, target))
+		target["phone_nos"][0]["phone"] = "456"
+		self.assertFalse(same_native_user_contact(source, target))
+		target = deepcopy(source)
+		target["user"] = "other@example.invalid"
+		self.assertFalse(same_native_user_contact(source, target))
