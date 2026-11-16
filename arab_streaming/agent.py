@@ -50,6 +50,7 @@ def main():
 			try:
 				frappe.init(site=args.site, sites_path=args.sites_path)
 				frappe.connect()
+				frappe.set_user("Administrator")  # Trusted service scanning, as in the per-peer orchestrator.
 				from arab_streaming.streaming.user_passwords import scan
 
 				scan()
