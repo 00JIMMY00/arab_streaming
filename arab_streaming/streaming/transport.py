@@ -60,6 +60,12 @@ def pending_for(peer, limit=25):
 			or destination.pairing_generation != state.pairing_generation
 		):
 			frappe.throw("Historical destination belongs to a different pairing")
+		if frappe.parse_json(event.data).get("user_password_version"):
+			capability = remote_call(peer, "arab_streaming.api.passwords.ready", **wire_identity(peer))
+			if not capability.get("supported") or not capability.get("enabled"):
+				frappe.throw(
+					"Upgrade the receiver and enable its published User password rule before delivery"
+				)
 		item = envelope(event, destination)
 		size += len(canonical_json(item))
 		if size > 3_500_000:

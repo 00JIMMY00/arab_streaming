@@ -55,6 +55,7 @@ def apply_document(
 	def after_apply(target):
 		for handler in frappe.get_hooks("arab_streaming_after_apply"):
 			frappe.get_attr(handler)(peer, source_document, target, config)
+
 	# A preserve-existing copy needs no attachment/password/dependency transfers.
 	if policy == "Skip":
 		from arab_streaming.streaming.mapping import mapped_name
@@ -285,6 +286,22 @@ def _apply_capture(capture, peer):
 	frappe.local.streaming_current_event = capture.remote_dispatch_event
 	frappe.local.streaming_current_sequence = capture.event_sequence
 	with replay(state.pairing_id, state.execution_user):
+		if data.get("user_password_version"):
+			from arab_streaming.streaming.mapping import mapped_name
+			from arab_streaming.streaming.user_passwords import apply as apply_password
+
+			if (
+				capture.event_type != "Update"
+				or capture.reference_doctype != "User"
+				or data["document"].get("doctype") != "User"
+				or data["document"].get("name") != capture.reference_name
+			):
+				frappe.throw("Invalid password event identity")
+			validate_document(data["document"])
+			if not frappe.db.exists("User", mapped_name(peer, "User", capture.reference_name)):
+				apply_document(peer, data["document"])
+			apply_password(peer, capture, data)
+			return "Success", "Password version applied"
 		if capture.event_type in ("Create", "Update", "Cancel"):
 			if (
 				data.get("document", {}).get("doctype") != capture.reference_doctype

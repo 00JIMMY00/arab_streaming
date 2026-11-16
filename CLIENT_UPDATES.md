@@ -1,3 +1,22 @@
+## 2026-11-16 — Opt-in central User passwords and transaction identity fixes
+
+Version 0.2.8 adds Master-to-Slave User password synchronization when the User
+rule's Include Passwords option is enabled. Both peers must be upgraded. Password
+changes create ordinary addressed Dispatch/Capture Events containing only an opaque
+version reference. Hashes are stored encrypted in protected versions and fetched
+only for the addressed event over the existing verified, authenticated transport.
+Plaintext passwords, API keys, reset tokens and sessions are never replicated.
+Administrator, Guest and integration identities remain excluded. Receiving a new
+password clears that user's Slave sessions. Native User saves are captured
+immediately; a bounded agent scan also detects native password-reset/Auth updates.
+
+Native fixed transaction counters without a naming_series field now include
+Branch and writer partitions. This prevents POS Opening/Closing identity clashes;
+existing records and immutable failed events are not renamed or overwritten.
+Queued native User contact maintenance restores its origin from persisted replica
+state, suppresses echo and checkpoints its local normalization. Posted flags cannot
+establish this authority.
+
 ## 2026-11-16 — Branch writer guard for interactive applications
 
 Version 0.2.7 exposes `ownership.assert_local_branch_writer(branch)` for consuming

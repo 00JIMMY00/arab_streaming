@@ -50,6 +50,10 @@ def main():
 			try:
 				frappe.init(site=args.site, sites_path=args.sites_path)
 				frappe.connect()
+				from arab_streaming.streaming.user_passwords import scan
+
+				scan()
+				frappe.db.commit()
 				role = frappe.conf.get("arab_streaming_site_role")
 				dt = "Slave Instance" if role == "Master" else "Master Instance"
 				if frappe.conf.get("arab_streaming_enabled") and role in ("Master", "Slave"):

@@ -16,7 +16,11 @@ def before_naming(doc, method=None):
 		or not doc.meta.has_field("naming_series")
 	):
 		return
-	rules = [r for r in stored_rules() if r.enabled and r.doctype_name == doc.doctype and direction_allowed(r.direction)]
+	rules = [
+		r
+		for r in stored_rules()
+		if r.enabled and r.doctype_name == doc.doctype and direction_allowed(r.direction)
+	]
 	if not rules:
 		return
 	check_source(doc)
@@ -58,3 +62,43 @@ def branch_identity(doc, method=None, *args):
 		frappe.throw(
 			"This Branch has a persistent streaming pairing. Reconcile/unlink that identity before renaming or deleting it."
 		)
+
+
+def fixed_series_autoname(doc, method=None):
+	"""Partition native transaction series that have no naming_series field."""
+	if (
+		replay_source()
+		or not frappe.conf.get("arab_streaming_enabled")
+		or not doc.meta.is_submittable
+		or doc.meta.has_field("naming_series")
+	):
+		return
+	series = doc.meta.autoname or ""
+	if "#" not in series or series.startswith(("field:", "format:", "naming_series:")):
+		return
+	rules = [
+		r
+		for r in stored_rules()
+		if r.enabled
+		and r.doctype_name == doc.doctype
+		and direction_allowed(r.direction)
+		and r.scope != "Shared"
+	]
+	if not rules:
+		return
+	check_source(doc)
+	branches = document_branches(doc, rules[0])
+	if not branches or len(branches) != 1:
+		frappe.throw("A transaction naming partition requires exactly one Branch")
+	branch = hashlib.sha256(next(iter(branches)).encode()).hexdigest()[:6].upper()
+	site = (
+		frappe.db.get_value("Streaming Site State", "local", "installation_id").replace("-", "")[:6].upper()
+	)
+	prefix = f"BR-{branch}-WR-{site}-"
+	if doc.name:
+		if not doc.name.startswith(prefix):
+			doc.name = prefix + doc.name
+	else:
+		from frappe.model.naming import make_autoname
+
+		doc.name = make_autoname(prefix + series, doc.doctype, doc=doc)

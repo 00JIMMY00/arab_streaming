@@ -39,6 +39,10 @@ def run():
 	):
 		return
 	from arab_streaming.streaming.delivery import run_peer
+	from arab_streaming.streaming.user_passwords import scan
+
+	scan()
+	frappe.db.commit()
 
 	dt = "Slave Instance" if frappe.conf.arab_streaming_site_role == "Master" else "Master Instance"
 	for name in frappe.get_all(dt, filters={"enabled": 1, "connection_status": "Connected"}, pluck="name"):

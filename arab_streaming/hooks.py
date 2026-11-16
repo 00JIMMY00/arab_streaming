@@ -45,3 +45,10 @@ doc_events["Branch"] = {
 	"before_rename": "arab_streaming.streaming.naming.branch_identity",
 	"on_trash": "arab_streaming.streaming.naming.branch_identity",
 }
+
+# The native User controller has stored its new password before this hook runs.
+doc_events["User"] = {"on_update": "arab_streaming.streaming.user_passwords.capture"}
+
+doc_events["*"]["autoname"] = "arab_streaming.streaming.naming.fixed_series_autoname"
+before_job = ["arab_streaming.streaming.user_contacts.before_job"]
+after_job = ["arab_streaming.streaming.user_contacts.after_job"]

@@ -26,6 +26,7 @@ WIRE_METHODS = frozenset(
 		"files": ("manifest", "chunk"),
 		"rules": ("schema",),
 		"stock": ("snapshot", "acknowledge"),
+		"passwords": ("fetch", "ready"),
 	}.items()
 	for method in methods
 )
