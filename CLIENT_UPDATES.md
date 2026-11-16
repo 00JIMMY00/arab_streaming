@@ -1,3 +1,11 @@
+## 2026-11-16 — Invalidate provisioned permissions after commit
+
+Version 0.2.10 clears provisioned DocType/user permission caches again after the
+permission transaction commits. Concurrent workers can otherwise cache the old
+committed metadata during policy publication even though the new grants are
+visible in the database. Immediate local invalidation is retained. No broader
+roles or permission bypasses are granted.
+
 ## 2026-11-16 — Capture native db_set and explicit consumer SQL updates
 
 Version 0.2.9 captures transferable changes made through Document.db_set using

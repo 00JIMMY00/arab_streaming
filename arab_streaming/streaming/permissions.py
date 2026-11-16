@@ -92,7 +92,19 @@ def provision(user, rules):
 		doc.append("roles", {"role": role})
 		doc.save(ignore_permissions=True)
 	frappe.clear_cache(user=user)
+	# Other workers can repopulate metadata from the old committed permissions
+	# while this transaction is still provisioning. Invalidate once more only
+	# after the grants and role membership have become visible to every worker.
+	from functools import partial
+
+	frappe.db.after_commit.add(partial(invalidate_provisioned_permissions, user, sorted(types)))
 	return sorted(types)
+
+
+def invalidate_provisioned_permissions(user, doctypes):
+	for doctype in doctypes:
+		frappe.clear_cache(doctype=doctype)
+	frappe.clear_cache(user=user)
 
 
 def refresh_site():
