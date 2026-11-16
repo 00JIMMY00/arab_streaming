@@ -106,6 +106,16 @@ class TestOutboxTransactions(FrappeTestCase):
 		self.assertFalse(frappe.db.exists("UOM", name))
 		self.assertFalse(frappe.db.exists("Dispatch Event", {"reference_name": name}))
 
+	def test_native_db_set_creates_one_atomic_update_and_unchanged_save_does_not_echo(self):
+		name = "Streaming dbset " + frappe.generate_hash(length=8)
+		doc = frappe.get_doc(dict(doctype="UOM", uom_name=name, must_be_whole_number=0)).insert()
+		self.assertEqual(frappe.db.count("Dispatch Event", {"reference_name": name}), 1)
+		doc.db_set("must_be_whole_number", 1)
+		self.assertEqual(frappe.db.count("Dispatch Event", {"reference_name": name}), 2)
+		doc.db_set("must_be_whole_number", 1)
+		doc.save()
+		self.assertEqual(frappe.db.count("Dispatch Event", {"reference_name": name}), 2)
+
 	def test_receipt_is_idempotent_and_utc_datetime_is_database_safe(self):
 		from arab_streaming.protocol.envelope import payload_digest
 		from arab_streaming.streaming.inbox import ingest

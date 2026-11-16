@@ -287,3 +287,31 @@ def store_event(
 	frappe.db.after_commit.add(wakeup)
 
 	return event
+
+
+def notify_persisted_change(before):
+	"""Consumer service hook after an authorized atomic SQL update, before commit."""
+	if not active(before):
+		return
+	after = frappe.get_doc(before.doctype, before.name)
+	after._doc_before_save = before
+	after._action = "save"
+	return capture(after, "on_update_after_submit" if after.docstatus else "on_update")
+
+
+def before_dbset(doc, method=None):
+	if not active(doc):
+		return
+	before = frappe.get_doc(doc.doctype, doc.name)
+	if digest(snapshot(before)) == digest(snapshot(doc)):
+		return
+	fence(doc, "before_validate")
+	doc._arab_streaming_dbset_before = before
+
+
+def after_dbset(doc, method=None):
+	before = getattr(doc, "_arab_streaming_dbset_before", None)
+	if before is None:
+		return
+	doc._arab_streaming_dbset_before = None
+	notify_persisted_change(before)

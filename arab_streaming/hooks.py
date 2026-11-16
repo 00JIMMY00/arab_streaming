@@ -52,3 +52,5 @@ doc_events["User"] = {"on_update": "arab_streaming.streaming.user_passwords.capt
 doc_events["*"]["autoname"] = "arab_streaming.streaming.naming.fixed_series_autoname"
 before_job = ["arab_streaming.streaming.user_contacts.before_job"]
 after_job = ["arab_streaming.streaming.user_contacts.after_job"]
+doc_events["*"]["before_change"] = "arab_streaming.streaming.outbox.before_dbset"
+doc_events["*"]["on_change"] = "arab_streaming.streaming.outbox.after_dbset"

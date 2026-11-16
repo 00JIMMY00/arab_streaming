@@ -1,3 +1,13 @@
+## 2026-11-16 — Capture native db_set and explicit consumer SQL updates
+
+Version 0.2.9 captures transferable changes made through Document.db_set using
+before_change/on_change, retaining the original document and transactional source
+fence. Unchanged values and the normal save/on_change sequence do not create
+extra dispatches; local-only fields do not activate ownership checks. Consumers
+that deliberately use raw SQL can call outbox.notify_persisted_change(before_doc)
+after their authorized write and before commit. Arbitrary external SQL writes do
+not generate model events. The notifier does not grant business write authority.
+
 ## 2026-11-16 — Opt-in central User passwords and transaction identity fixes
 
 Version 0.2.8 adds Master-to-Slave User password synchronization when the User
