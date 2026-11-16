@@ -83,6 +83,23 @@ class TestFinancialLifecycle(FrappeTestCase):
 		)
 		self.assertEqual(self.ledger(source.name), expected)
 
+	def test_native_status_metadata_keeps_ledger_and_amounts_unchanged(self):
+		frappe.db.savepoint("status_source")
+		source = invoice(self.fixtures)
+		source.submit()
+		document = snapshot(source)
+		expected = self.ledger(source.name)
+		frappe.db.rollback(save_point="status_source")
+		with replay("status-test", self.fixtures["user"]):
+			peer = frappe._dict(doctype="Master Instance")
+			apply_document(peer, document)
+			changed = dict(document, status="Credit Note Issued")
+			apply_document(peer, changed)
+			apply_document(peer, changed)
+		self.assertEqual(frappe.db.get_value("Sales Invoice", source.name, "status"), "Credit Note Issued")
+		self.assertEqual(self.ledger(source.name), expected)
+		self.assertEqual(frappe.db.get_value("Sales Invoice", source.name, "grand_total"), source.grand_total)
+
 	def test_submitted_invoice_can_be_copied_without_a_prior_draft(self):
 		frappe.db.savepoint("source_trial")
 		source = invoice(self.fixtures)

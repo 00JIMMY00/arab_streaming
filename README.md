@@ -1,3 +1,13 @@
+## 2026-11-16 — Apply native post-submit financial metadata narrowly
+
+Version 0.2.13 handles Sales Invoice status and POS Invoice status/consolidated
+invoice through a narrow adapter. The ordinary native financial save still checks
+immutable accounting fields, links, permissions and amounts. Only validated native
+status metadata is staged and then written through Document.db_set. Consolidation
+links must reference a readable Sales Invoice in the same Company containing this
+POS Invoice. No global ignore_update_after_submit flag is used and no ledger rows
+are copied or reposted for a status-only update.
+
 ## 2026-11-16 — Keep localized tax rendering local
 
 Version 0.2.12 excludes other_charges_calculation (native localized tax-breakup

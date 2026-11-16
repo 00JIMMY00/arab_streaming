@@ -209,6 +209,10 @@ def apply_document(
 					kept.append(row)
 			if len(kept) != len(document.get("links") or []):
 				document["links"] = kept
+	from arab_streaming.streaming.financial_metadata import apply as apply_financial_metadata
+	from arab_streaming.streaming.financial_metadata import stage as stage_financial_metadata
+
+	derived_metadata = stage_financial_metadata(target, document)
 	doc = target or frappe.get_doc(dict(document, docstatus=0))
 	values = {key: item for key, item in document.items() if key not in ("doctype", "name", "docstatus")}
 	if target:
@@ -244,6 +248,7 @@ def apply_document(
 		doc.save()
 	else:
 		doc.insert(set_name=name, set_child_names=False)
+	apply_financial_metadata(doc, derived_metadata)
 	if desired_status in (1, 2) and doc.docstatus == 0:
 		doc.submit()
 	if desired_status == 2 and doc.docstatus == 1:
