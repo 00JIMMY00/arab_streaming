@@ -12,9 +12,33 @@ from arab_streaming.streaming.guards import system_write
 def eligible(user):
 	return bool(
 		user
-		and user not in ("Administrator", "Guest")
+		and user != "Guest"
+		and (user != "Administrator" or administrator_enabled())
 		and not user.endswith(("@rms.invalid", "@arab-erp.invalid"))
 	)
+
+
+def administrator_enabled():
+	return frappe.utils.cint(frappe.conf.get("arab_streaming_sync_administrator_password")) == 1
+
+
+def administrator_event(reference_name, data):
+	"""An explicit password-only capability never authorizes Administrator profiles."""
+	admin = reference_name == "Administrator"
+	if admin:
+		if (
+			not administrator_enabled()
+			or data.get("administrator_password_only") != 1
+			or data.get("document") != {"doctype": "User", "name": "Administrator", "docstatus": 0}
+			or set(data) != {"document", "user_password_version", "administrator_password_only"}
+		):
+			frappe.throw(
+				"Administrator password synchronization requires explicit password-only opt-in",
+				frappe.PermissionError,
+			)
+	elif data.get("administrator_password_only"):
+		frappe.throw("Invalid Administrator password identity", frappe.PermissionError)
+	return admin
 
 
 def last_fingerprint(user):
@@ -26,7 +50,7 @@ def last_fingerprint(user):
 	)
 
 
-def capture(doc, method=None):
+def capture(doc, method=None, *, destination=None):
 	if (
 		not eligible(doc.name)
 		or replay_source()
@@ -38,7 +62,12 @@ def capture(doc, method=None):
 	from arab_streaming.streaming.outbox import fence, recipients, store_event
 
 	fence(doc)
-	selected = [item for item in recipients(doc, "on_update") if item[2].get("include_passwords")]
+	admin = doc.name == "Administrator"
+	selected = [
+		item
+		for item in recipients(doc, "administrator_password" if admin else "on_update")
+		if item[2].get("include_passwords") and (destination is None or item[0].name == destination)
+	]
 	if not selected:
 		return
 	rows = frappe.db.sql(
@@ -49,7 +78,7 @@ def capture(doc, method=None):
 		return
 	hashed = rows[0][0]
 	fingerprint = hashlib.sha256(hashed.encode()).hexdigest()
-	if last_fingerprint(doc.name) == fingerprint:
+	if destination is None and last_fingerprint(doc.name) == fingerprint:
 		return
 	with system_write():
 		version = frappe.get_doc(
@@ -61,13 +90,54 @@ def capture(doc, method=None):
 				secret_data=json.dumps({"hash": hashed}),
 			)
 		).insert(ignore_permissions=True)
+	data = {
+		"document": {"doctype": "User", "name": "Administrator", "docstatus": 0} if admin else snapshot(doc),
+		"user_password_version": version.name,
+	}
+	options = {}
+	if admin:
+		data.update(
+			document={"doctype": "User", "name": "Administrator", "docstatus": 0},
+			administrator_password_only=1,
+		)
+		options.update(_related_prepared=True, _frozen_versions=[])
 	return store_event(
 		doc,
 		"Update",
 		selected,
-		data={"document": snapshot(doc), "user_password_version": version.name},
+		data=data,
 		method="password_changed",
+		**options,
 	)
+
+
+def seed_receiver(name, pairing_id, pairing_generation):
+	"""Seed a newly registered receiver even if another peer has the current hash."""
+	if (
+		not frappe.conf.get("arab_streaming_enabled")
+		or frappe.conf.get("arab_streaming_site_role") != "Master"
+	):
+		return
+	from arab_streaming.streaming.connections import peer_state
+	from arab_streaming.streaming.policy import stored_rules
+
+	peer = frappe.get_doc("Slave Instance", name)
+	state = peer_state(peer.doctype, name)
+	if (
+		not peer.enabled
+		or peer.connection_status != "Connected"
+		or state.pairing_id != pairing_id
+		or str(state.pairing_generation) != str(pairing_generation)
+	):
+		return  # An old registration job cannot seed a replacement pairing.
+	if not any(r.enabled and r.doctype_name == "User" and r.include_passwords for r in stored_rules()):
+		return
+	for user in frappe.db.sql(
+		"SELECT name FROM `__Auth` WHERE doctype='User' AND fieldname='password' AND encrypted=0", pluck=True
+	):
+		if eligible(user):
+			capture(frappe.get_doc("User", user), destination=name)
+			frappe.db.commit()
 
 
 def scan(limit=20):
@@ -103,6 +173,7 @@ def fetch(peer, event_name, version_name):
 		)
 	event = frappe.get_doc("Dispatch Event", event_name)
 	data = frappe.parse_json(event.data)
+	admin = administrator_event(event.reference_name, data)
 	if (
 		event.reference_doctype != "User"
 		or not eligible(event.reference_name)
@@ -127,7 +198,13 @@ def fetch(peer, event_name, version_name):
 	if not config or not config.include_passwords:
 		frappe.throw("User password synchronization is disabled", frappe.PermissionError)
 	authorize_document(peer, data["document"])
-	frappe.get_doc("User", event.reference_name).check_permission("read")
+	if admin:
+		if frappe.session.user != state.execution_user:
+			frappe.throw(
+				"Administrator password fetch requires the paired execution identity", frappe.PermissionError
+			)
+	else:
+		frappe.get_doc("User", event.reference_name).check_permission("read")
 	version = frappe.get_doc("Streaming Protected Version", version_name)
 	if version.reference_doctype != "User" or version.reference_name != event.reference_name:
 		frappe.throw("Password identity mismatch", frappe.PermissionError)
@@ -152,9 +229,25 @@ def apply(peer, capture_doc, data):
 	from arab_streaming.streaming.mapping import mapped_name
 
 	user = mapped_name(peer, "User", capture_doc.reference_name)
+	admin = administrator_event(capture_doc.reference_name, data)
 	if not eligible(user):
 		frappe.throw("Protected identities cannot receive passwords", frappe.PermissionError)
-	frappe.get_doc("User", user).check_permission("write")
+	if admin:
+		from arab_streaming.streaming.connections import peer_state
+
+		state = peer_state(peer.doctype, peer.name)
+		if (
+			user != "Administrator"
+			or replay_source() != state.pairing_id
+			or frappe.session.user != state.execution_user
+		):
+			frappe.throw(
+				"Administrator password apply requires the paired execution context", frappe.PermissionError
+			)
+	elif user == "Administrator":
+		frappe.throw("A regular User cannot map to Administrator credentials", frappe.PermissionError)
+	else:
+		frappe.get_doc("User", user).check_permission("write")
 	from arab_streaming.streaming.client import remote_call
 	from arab_streaming.streaming.connections import wire_identity
 

@@ -67,12 +67,22 @@ def recipients(doc, method, *args):
 				from arab_streaming.streaming.policy import config_for, matches_scope
 
 				row = config_for(peer, doc.doctype, cursor=cursor)
+				admin_password = bool(
+					method == "administrator_password"
+					and doc.doctype == "User"
+					and doc.name == "Administrator"
+					and frappe.utils.cint(frappe.conf.get("arab_streaming_sync_administrator_password")) == 1
+					and row
+					and row.get("include_passwords")
+					and row.get("scope") == "Shared"
+				)
 				config = None
 				if row:
 					validate_config(row)
 					flag = {
 						"after_insert": "event_create",
 						"on_update": "event_update",
+						"administrator_password": "event_update",
 						"on_submit": "event_submit",
 						"on_cancel": "event_cancel",
 						"on_trash": "event_delete",
@@ -83,7 +93,10 @@ def recipients(doc, method, *args):
 					if (
 						(method != "on_update_after_submit" or row.sync_events_after_submit)
 						and matches_scope(doc, row, peer.restaurant_branch, required=True)
-						and matches(parse(row.conditions, condition_fields(doc.doctype)), doc)
+						and (
+							admin_password
+							or matches(parse(row.conditions, condition_fields(doc.doctype)), doc)
+						)
 					):
 						from arab_streaming.streaming.policy import RULE_FIELDS
 
@@ -91,6 +104,8 @@ def recipients(doc, method, *args):
 						config["field_mappings"] = row.get("field_mappings") or []
 						config.update(rule_id=row.name, rule_revision=row.get("revision") or 0)
 				if config is None:
+					if method == "administrator_password":
+						continue  # Password-only opt-in never comes from a bootstrap selection.
 					cursor.execute(
 						"SELECT name, configuration FROM `tabStreaming Export` WHERE peer_state=%s AND status=%s",
 						(state.name, "In Progress"),

@@ -66,6 +66,12 @@ def pending_for(peer, limit=25):
 				frappe.throw(
 					"Upgrade the receiver and enable its published User password rule before delivery"
 				)
+			if frappe.parse_json(event.data).get("administrator_password_only") and not capability.get(
+				"administrator_enabled"
+			):
+				frappe.throw(
+					"Enable explicit Administrator password synchronization on the receiver before delivery"
+				)
 		item = envelope(event, destination)
 		size += len(canonical_json(item))
 		if size > 3_500_000:

@@ -302,8 +302,14 @@ def _apply_capture(capture, peer):
 				or data["document"].get("name") != capture.reference_name
 			):
 				frappe.throw("Invalid password event identity")
-			validate_document(data["document"])
+			from arab_streaming.streaming.user_passwords import administrator_event
+
+			admin = administrator_event(capture.reference_name, data)
+			if not admin:
+				validate_document(data["document"])
 			if not frappe.db.exists("User", mapped_name(peer, "User", capture.reference_name)):
+				if admin:
+					frappe.throw("The native Administrator account must already exist")
 				apply_document(peer, data["document"])
 			apply_password(peer, capture, data)
 			return "Success", "Password version applied"

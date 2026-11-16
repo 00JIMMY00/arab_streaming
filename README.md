@@ -1,3 +1,25 @@
+## 2026-11-16 — Explicit Administrator password synchronization
+
+Version 0.2.15 adds a separate password-only opt-in for Administrator. Enable
+`arab_streaming_sync_administrator_password` with JSON value `1` in both sites'
+site configuration, alongside the enabled shared User rule's Include Passwords.
+The usual User condition may continue excluding Administrator and Guest. Only
+the Administrator password is synchronized from Master to Slave; its profile,
+roles, API credentials and integration identities remain local. The receiver
+must advertise this capability before delivery. Changing the password invalidates
+the Slave's Administrator sessions. Guest is always excluded.
+
+New paired receivers are seeded with current eligible passwords after their
+registration commits, so an unchanged password already delivered to another
+Slave is also delivered to the new one. Seeding is addressed to that receiver
+and is discarded if its pairing generation changed before the job runs.
+
+Native consumer cancellation can also checkpoint an existing companion movement
+against its original addressed Cancel event. Permissions, source-base conflict
+checks, backlinks and native ledger reversal still run. This supports a parent
+that must cancel its own movement while its active backlink would otherwise
+block the movement's earlier event. No second movement is created.
+
 ## 2026-11-16 — Preserve verified native financial defaults and closing reference identity
 
 Version 0.2.14 preserves an existing posted Item Group when an older source item

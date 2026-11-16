@@ -126,8 +126,18 @@ def register_receiver(
 		frappe.throw("Register the branch receiver on its master")
 	if not all(isinstance(x, str) and re.fullmatch(r"[A-Za-z0-9]{15}", x) for x in (access_key, secret)):
 		frappe.throw("Invalid paired receiver credentials")
+	new_receiver = state.remote_access_key != access_key
 	with system_write():
 		state.remote_access_key = access_key
 		state.remote_secret = secret
 		state.save(ignore_permissions=True)
+	if new_receiver:
+		frappe.enqueue(
+			"arab_streaming.streaming.user_passwords.seed_receiver",
+			name=peer.name,
+			pairing_id=state.pairing_id,
+			pairing_generation=state.pairing_generation,
+			enqueue_after_commit=True,
+			timeout=3600,
+		)
 	return bundle(peer)

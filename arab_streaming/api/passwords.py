@@ -25,7 +25,10 @@ def ready(protocol, version, pairing_id, source_installation_id, pairing_generat
 	from arab_streaming.streaming.policy import config_for
 
 	config = config_for(peer, "User", incoming=True)
+	from arab_streaming.streaming.user_passwords import administrator_enabled
+
 	return {
 		"supported": True,
 		"enabled": bool(peer.doctype == "Master Instance" and config and config.include_passwords),
+		"administrator_enabled": administrator_enabled(),
 	}
